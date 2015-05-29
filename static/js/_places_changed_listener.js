@@ -1,3 +1,5 @@
+var buildHtmlList = require('./_make_html_marker_list').buildHtmlList;
+
 var searchBoxListener = function(searchBox, chosenPlaces, lookup, map, markers) {
 
   google.maps.event.addListener(searchBox, 'places_changed', function() {
@@ -9,8 +11,7 @@ var searchBoxListener = function(searchBox, chosenPlaces, lookup, map, markers) 
     if (places.length == 0) {
       return;
     } else if (places.length == 1 && lookup.indexOf(place.id) == -1) {
-      chosenPlaces.push(place);
-      lookup.push(place.id);
+      chosenPlaces.push(place);  // TODO: pointless?
 
       // making google maps marker
       var marker = new google.maps.Marker({
@@ -18,28 +19,15 @@ var searchBoxListener = function(searchBox, chosenPlaces, lookup, map, markers) 
         // icon: image,
         draggable: true,
         title: place.name,
-        position: place.geometry.location
+        position: place.geometry.location,
+        id: markers.length + 1
       });
 
       markers.push(marker);
+      lookup.push(marker.id);
 
-      var outerList = document.getElementById('chosen-places-list');
-      var innerListElement = document.createElement('div');
-
-      if (chosenPlaces.length % 2 == 0) {
-        innerListElement.className = "background-color-1a color-6";
-      } else {
-        innerListElement.className = "background-color-2a color-6";
-      }
-
-      innerListElement.id = "chosen-place";
-
-      var paragraphElement = document.createElement('p');
-      paragraphElement.innerHTML = place.formatted_address;
-
-      innerListElement.appendChild(paragraphElement);
-      outerList.appendChild(innerListElement);
-
+      // Build HTML list at the bottom of the page
+      buildHtmlList(lookup, marker, place);
     } else {
       console.log('select one location not already selected');
     }

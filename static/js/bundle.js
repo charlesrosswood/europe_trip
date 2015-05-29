@@ -38,7 +38,6 @@ var HttpClient = function() {
 
     anHttpRequest.open( "POST", aUrl, true );
 
-    //anHttpRequest.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     anHttpRequest.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 
     anHttpRequest.send(JSON.stringify(bodyData));
@@ -48,26 +47,74 @@ var HttpClient = function() {
 // Export the HttpClient module
 exports.HttpClient = HttpClient;
 },{}],2:[function(require,module,exports){
-var markerListener = function(markers, drawingManager) {
+var buildHtmlList = function(lookupList, marker, place) {
+
+  // TODO: is this necessary with the check down lower?
+  if (typeof place === 'undefined') {
+    place = null;
+  }
+
+  var outerList = document.getElementById('chosen-places-list');
+  var innerListElement = document.createElement('div');
+
+  if (lookupList.length % 2 == 0) {
+    innerListElement.className = 'background-color-1a color-6';
+  } else {
+    innerListElement.className = 'background-color-2a color-6';
+  }
+
+  innerListElement.id = 'chosen-place';
+  innerListElement.setAttribute('data-marker-id', marker.id);
+
+  // make these list elements draggable
+  innerListElement.setAttribute('draggable', true);
+
+  var paragraphElement = document.createElement('p');
+  var innerHtmlText = 'Marker ' + marker.id;
+
+  // if we have a google place, lets use its address in the label
+  if (place != null) {
+    innerHtmlText = innerHtmlText + ' (' + place.formatted_address + ')';
+  }
+
+  paragraphElement.innerHTML = innerHtmlText;
+
+  innerListElement.appendChild(paragraphElement);
+  outerList.appendChild(innerListElement);
+}
+
+exports.buildHtmlList = buildHtmlList;
+},{}],3:[function(require,module,exports){
+var buildHtmlList = require('./_make_html_marker_list').buildHtmlList;
+
+var markerListener = function(markers, drawingManager, lookupList) {
 
   google.maps.event.addListener(drawingManager, 'markercomplete', function(marker) {
 
+    marker.set("id", markers.length + 1);
+
+    lookupList.push(marker.id);
     markers.push(marker);
-    console.log(markers);
+
     google.maps.event.addListener(marker, 'dragend', function() {
       var objLatLng = marker.getPosition();
       console.log(objLatLng);
     });
 
     google.maps.event.addListener(marker, 'click', function() {
-
+      // insert select function here, to enable delete
     });
+
+    // build the HTML list at the bottom of the page
+    buildHtmlList(lookupList, marker);
   });
 
 }
 
 exports.markerListener = markerListener;
-},{}],3:[function(require,module,exports){
+},{"./_make_html_marker_list":2}],4:[function(require,module,exports){
+var buildHtmlList = require('./_make_html_marker_list').buildHtmlList;
+
 var searchBoxListener = function(searchBox, chosenPlaces, lookup, map, markers) {
 
   google.maps.event.addListener(searchBox, 'places_changed', function() {
@@ -79,8 +126,7 @@ var searchBoxListener = function(searchBox, chosenPlaces, lookup, map, markers) 
     if (places.length == 0) {
       return;
     } else if (places.length == 1 && lookup.indexOf(place.id) == -1) {
-      chosenPlaces.push(place);
-      lookup.push(place.id);
+      chosenPlaces.push(place);  // TODO: pointless?
 
       // making google maps marker
       var marker = new google.maps.Marker({
@@ -88,28 +134,15 @@ var searchBoxListener = function(searchBox, chosenPlaces, lookup, map, markers) 
         // icon: image,
         draggable: true,
         title: place.name,
-        position: place.geometry.location
+        position: place.geometry.location,
+        id: markers.length + 1
       });
 
       markers.push(marker);
+      lookup.push(marker.id);
 
-      var outerList = document.getElementById('chosen-places-list');
-      var innerListElement = document.createElement('div');
-
-      if (chosenPlaces.length % 2 == 0) {
-        innerListElement.className = "background-color-1a color-6";
-      } else {
-        innerListElement.className = "background-color-2a color-6";
-      }
-
-      innerListElement.id = "chosen-place";
-
-      var paragraphElement = document.createElement('p');
-      paragraphElement.innerHTML = place.formatted_address;
-
-      innerListElement.appendChild(paragraphElement);
-      outerList.appendChild(innerListElement);
-
+      // Build HTML list at the bottom of the page
+      buildHtmlList(lookup, marker, place);
     } else {
       console.log('select one location not already selected');
     }
@@ -120,12 +153,12 @@ var searchBoxListener = function(searchBox, chosenPlaces, lookup, map, markers) 
 }
 
 exports.searchBoxListener = searchBoxListener;
-},{}],4:[function(require,module,exports){
+},{"./_make_html_marker_list":2}],5:[function(require,module,exports){
 var HttpClient = require('./_http_client').HttpClient;
 var searchBoxListener = require('./_places_changed_listener').searchBoxListener;
 var markerListener = require('./_marker_listener').markerListener;
 
-var chosenPlaces = [];
+var chosenPlaces = [];  // TODO: pointless?
 var lookup = [];
 var markers = [];
 
@@ -165,7 +198,7 @@ function initialise() {
   // pick list. Retrieve the matching places for that item
   searchBoxListener(searchBox, chosenPlaces, lookup, map, markers);
 
-  markerListener(markers, drawingManager);
+  markerListener(markers, drawingManager, lookup);
 
 }
 
@@ -199,4 +232,4 @@ function saveRoute() {
 //  }
 //});
 
-},{"./_http_client":1,"./_marker_listener":2,"./_places_changed_listener":3}]},{},[4]);
+},{"./_http_client":1,"./_marker_listener":3,"./_places_changed_listener":4}]},{},[5]);

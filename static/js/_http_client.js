@@ -37,7 +37,6 @@ var HttpClient = function() {
 
     anHttpRequest.open( "POST", aUrl, true );
 
-    //anHttpRequest.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     anHttpRequest.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 
     anHttpRequest.send(JSON.stringify(bodyData));

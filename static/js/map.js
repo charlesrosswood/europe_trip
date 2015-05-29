@@ -2,7 +2,7 @@ var HttpClient = require('./_http_client').HttpClient;
 var searchBoxListener = require('./_places_changed_listener').searchBoxListener;
 var markerListener = require('./_marker_listener').markerListener;
 
-var chosenPlaces = [];
+var chosenPlaces = [];  // TODO: pointless?
 var lookup = [];
 var markers = [];
 
@@ -42,7 +42,7 @@ function initialise() {
   // pick list. Retrieve the matching places for that item
   searchBoxListener(searchBox, chosenPlaces, lookup, map, markers);
 
-  markerListener(markers, drawingManager);
+  markerListener(markers, drawingManager, lookup);
 
 }
 
