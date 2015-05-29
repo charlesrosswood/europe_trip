@@ -4,18 +4,18 @@ __author__ = 'cwod'
 from flask import Flask, render_template
 import py_modules.db_config as database
 import json
-import platform
 from flask import request
+import platform
+import os
 
-print(platform.system())
 
 if platform.system() in ['Windows', 'Darwin']:
     _HOST_ = 'localhost'
     _DBNAME_ = 'postgres'
     _USER_ = 'cwod'
     _PASSWORD_ = ''
-else:
-    _HOST_ = 'localhost'
+else:  # heroku
+    _HOST_ = os.environ['DATABASE_URL']
     _DBNAME_ = 'postgres'
     _USER_ = 'cwod'
     _PASSWORD_ = ''
@@ -23,7 +23,7 @@ else:
 db = database.DatabaseConfig(host=_HOST_, dbname=_DBNAME_, user=_USER_,
     password=_PASSWORD_)
 
-app = Flask(__name__, debug=True)
+app = Flask(__name__)
 
 def decode_request(request_obj):
     con_type = request_obj.content_type
