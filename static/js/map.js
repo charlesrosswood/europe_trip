@@ -70,8 +70,12 @@ function initialise() {
 
       innerListElement.id = "chosen-place";
 
-      innerListElement.innerHTML = place.formatted_address;
+      var paragraphElement = document.createElement('p');
+      paragraphElement.innerHTML = place.formatted_address;
+
+      innerListElement.appendChild(paragraphElement);
       outerList.appendChild(innerListElement);
+
     } else {
       console.log('select one location not already selected');
     }
