@@ -31,7 +31,7 @@ class DatabaseConfig(object):
 
     """
 
-    def __init__(self, host, dbname, user='postgres', password='postgres'):
+    def __init__(self, host, dbname, user='postgres', password='postgres', port=5432):
         """
         Use this to instatiate the Database config class
 
@@ -41,8 +41,11 @@ class DatabaseConfig(object):
         :param password:
         :return:
         """
-        connection_string = "host='%s' dbname='%s' user='%s' password='%s'" % (host, dbname,
-                                                                               user, password)
+        connection_string = "host='%s' dbname='%s' user='%s' password='%s' port=%s" % (host,
+                                                                                       dbname,
+                                                                                       user,
+                                                                                       password,
+                                                                                       port)
 
         self.config = connection_string  # is this unnecessary?
 

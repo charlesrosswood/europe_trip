@@ -15,10 +15,13 @@ if platform.system() in ['Windows', 'Darwin']:
     _USER_ = 'cwod'
     _PASSWORD_ = ''
 else:  # heroku
-    _HOST_ = os.environ['DATABASE_URL']
-    _DBNAME_ = 'postgres'
-    _USER_ = 'cwod'
-    _PASSWORD_ = ''
+    db_url = os.environ['DATABASE_URL']
+
+    _HOST_ = db_url.split('@')[1].split(':')[0]
+    _DBNAME_ = db_url.split('/')[-1]
+    _USER_ = db_url.split('//')[1].split(':')[0]
+    _PASSWORD_ = db_url..split(':')[2].split('@')[0]
+    _PORT_ = int(db_url.split(':')[-1].split('/')[0])
 
 db = database.DatabaseConfig(host=_HOST_, dbname=_DBNAME_, user=_USER_,
     password=_PASSWORD_)
