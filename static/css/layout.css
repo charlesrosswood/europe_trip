@@ -13,6 +13,12 @@ html, body {
   margin-bottom: 10px*/
 }
 
+p {
+  font-family: 'Lato', sans-serif;
+  font-size: 20px;
+  margin: 0;
+}
+
 .header {
   display: inline-block;
 }
@@ -104,6 +110,11 @@ button#save-button {
 #chosen-place {
   padding-left: 5%;
 }
+
+
+
+
+
 
 
 .myButton {
