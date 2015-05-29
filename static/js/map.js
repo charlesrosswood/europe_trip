@@ -1,3 +1,7 @@
+var HttpClient = require('./_http_client').HttpClient;
+var searchBoxListener = require('./_places_changed_listener').searchBoxListener;
+var markerListener = require('./_marker_listener').markerListener;
+
 var chosenPlaces = [];
 var lookup = [];
 var markers = [];
@@ -36,116 +40,14 @@ function initialise() {
   // [START region_getplaces]
   // Listen for the event fired when the user selects an item from the
   // pick list. Retrieve the matching places for that item
-  google.maps.event.addListener(searchBox, 'places_changed', function() {
-    var places = searchBox.getPlaces();
-    var place = places[0];
+  searchBoxListener(searchBox, chosenPlaces, lookup, map, markers);
 
-    console.log(place);
-
-    if (places.length == 0) {
-      return;
-    } else if (places.length == 1 && lookup.indexOf(place.id) == -1) {
-      chosenPlaces.push(place);
-      lookup.push(place.id);
-
-      // making google maps marker
-      var marker = new google.maps.Marker({
-        map: map,
-        // icon: image,
-        draggable: true,
-        title: place.name,
-        position: place.geometry.location
-      });
-
-      markers.push(marker);
-
-      var outerList = document.getElementById('chosen-places-list');
-      var innerListElement = document.createElement('div');
-
-      if (chosenPlaces.length % 2 == 0) {
-        innerListElement.className = "background-color-1a color-6";
-      } else {
-        innerListElement.className = "background-color-2a color-6";
-      }
-
-      innerListElement.id = "chosen-place";
-
-      var paragraphElement = document.createElement('p');
-      paragraphElement.innerHTML = place.formatted_address;
-
-      innerListElement.appendChild(paragraphElement);
-      outerList.appendChild(innerListElement);
-
-    } else {
-      console.log('select one location not already selected');
-    }
-
-    console.log(markers);
-  });
-
-  google.maps.event.addListener(drawingManager, 'markercomplete', function(marker) {
-
-    markers.push(marker);
-    console.log(markers);
-    google.maps.event.addListener(marker, 'dragend', function() {
-      var objLatLng = marker.getPosition();
-      console.log(objLatLng);
-    });
-
-    google.maps.event.addListener(marker, 'click', function() {
-
-    });
-  });
+  markerListener(markers, drawingManager);
 
 }
 
 google.maps.event.addDomListener(window, 'load', initialise);
 
-var HttpClient = function() {
-
-  function buildFormData(jsonObj) {
-    var encodedData = '';
-    var encodedPairs = [];
-
-    for (var key in jsonObj) {
-      var value = jsonObj[key];
-      encodedPairs.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
-    }
-
-    // replace spaces with pluses
-    encodedData = encodedPairs.join('&').replace(/%20/g, '+');
-    return encodedData;
-  }
-
-  this.get = function(aUrl, aCallback) {
-    var anHttpRequest = new XMLHttpRequest();
-    anHttpRequest.onreadystatechange = function() {
-      if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
-        aCallback(anHttpRequest.responseText);
-    }
-
-    anHttpRequest.open( "GET", aUrl, true );
-
-    anHttpRequest.setRequestHeader('Connection', 'close');
-
-    anHttpRequest.send( null );
-  }
-
-  this.post = function(aUrl, bodyData, aCallback) {
-    var anHttpRequest = new XMLHttpRequest();
-    anHttpRequest.onreadystatechange = function() {
-      if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
-        aCallback(anHttpRequest.responseText);
-    }
-
-    anHttpRequest.open( "POST", aUrl, true );
-
-    //anHttpRequest.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    anHttpRequest.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-
-    anHttpRequest.send(JSON.stringify(bodyData));
-  }
-}
 
 function saveRoute() {
   var url = 'save-route';
