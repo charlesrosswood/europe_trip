@@ -23,7 +23,7 @@ else:
 db = database.DatabaseConfig(host=_HOST_, dbname=_DBNAME_, user=_USER_,
     password=_PASSWORD_)
 
-app = Flask(__name__)
+app = Flask(__name__, debug=True)
 
 def decode_request(request_obj):
     con_type = request_obj.content_type
