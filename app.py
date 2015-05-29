@@ -48,7 +48,7 @@ def decode_request(request_obj):
 @app.route('/', methods=['GET'])
 def index():
     server_address = request.remote_addr
-    return render_template('landing_page.html', server_address = server_address)
+    return render_template('landing_page.html')
 
 @app.route('/read', methods=['GET'])
 def read():
@@ -69,6 +69,22 @@ def save_route():
     print(request_data)
 
     return json.dumps(True)
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template('403.html'), 403
+
+@app.errorhandler(410)
+def gone(e):
+    return render_template('410.html'), 410
+
+@app.errorhandler(500)
+def server_error(e):
+    return render_template('500.html'), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
