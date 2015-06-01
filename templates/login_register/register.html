@@ -4,7 +4,7 @@
 	<head profile="http://www.w3.org/2005/10/profile">
 		<meta charset="UTF-8">
 		<!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-		<title>Upload images</title>
+		<title>Registration page</title>
 
 		<link rel="icon"
 			  type="image/png"
@@ -32,30 +32,26 @@
 				src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7oYhGu2nYJUFZOEVh1Z7qdpjlriSzdEc&libraries=places,drawing">
 		</script>
 
-
 	</head>
 
     <body class="background-color-0">
-        <div id="header-container" class="vert-25-percent color-6">
+        <div id="header-container" class="color-6 vert-25-percent">
             <div class="margin-left-5 delayed-fade-in">
-                Choose your photos to upload
+                Welcome to the registration page!
             </div>
             <div class="slide-in-from-right hline background-color-1a margin-left-5"></div>
 
-			<form class="margin-left-5 delayed-fade-in" onSubmit="event.preventDefault()"
-				  id="upload-photo" name="uploadForm">
-				<input type="file" name="image" id="file-field"><br/>
-				<input type="submit" name="submit" id="upload-button" value="Submit">
+			{% from "login_register/_formhelpers.html" import render_field %}
+			<form method=post action="/register" class="body-font">
+			  <dl>
+				{{ render_field(form.username) }}
+				{{ render_field(form.email) }}
+				{{ render_field(form.password) }}
+				{{ render_field(form.confirm) }}
+			  </dl>
+			  <p><input type=submit value=Register></p>
 			</form>
-
-			<div id="img-preview">
-
-			</div>
         </div>
-
     </body>
-	<script type="text/javascript"
-		src="{{ url_for('static', filename='js/upload_view/upload_view_bundle.js') }}"></script>
-		<!--src="{{ url_for('static', filename='js/upload_view/main.js') }}"></script>-->
 
 </html>

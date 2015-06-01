@@ -133,7 +133,7 @@ var HttpClient = function() {
     anHttpRequest.open( "GET", aUrl, true );
 
     anHttpRequest.send( null );
-  }
+  };
 
   this.post = function(aUrl, bodyData, aCallback) {
     var anHttpRequest = new XMLHttpRequest();
@@ -147,7 +147,30 @@ var HttpClient = function() {
     anHttpRequest.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 
     anHttpRequest.send(JSON.stringify(bodyData));
-  }
+  };
+
+  this.postImgur = function(imgFile, aCallback) {
+
+    var aUrl = 'https://api.imgur.com/3/image';
+    // create new form to send to imgur
+    var fd = new FormData();
+    fd.append('image', imgFile);
+
+    var anHttpRequest = new XMLHttpRequest();
+
+    anHttpRequest.onreadystatechange = function() {
+      if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
+        aCallback(anHttpRequest.responseText);
+    }
+
+    anHttpRequest.open('POST', aUrl);
+
+    var clientId = 'a9cda2e43ea6ba9';
+    anHttpRequest.setRequestHeader('Authorization', 'Client-ID ' + clientId)
+
+    anHttpRequest.send(fd);
+  };
+
 }
 
 // Export the HttpClient module

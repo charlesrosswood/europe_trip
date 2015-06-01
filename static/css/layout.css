@@ -13,6 +13,11 @@ html, body {
   margin-bottom: 10px*/
 }
 
+.body-font {
+  font-family: 'Lato', sans-serif;
+  font-size: 20px;
+}
+
 p {
   font-family: 'Lato', sans-serif;
   font-size: 20px;
@@ -36,6 +41,13 @@ p {
 .vert-center {
   position: relative;
   top: 50%;
+  transform: translateY(-50%);
+  -webkit-transform: -webkit-translateY(-50%);
+}
+
+.vert-25-percent {
+  position: relative;
+  top: 25%;
   transform: translateY(-50%);
   -webkit-transform: -webkit-translateY(-50%);
 }
@@ -111,13 +123,11 @@ button#save-button {
   padding-left: 5%;
 }
 
+.upload-img-prev {
+  width: 50%;
+}
 
-
-
-
-
-
-.myButton {
+.button {
 	-moz-box-shadow: 0px 1px 0px 0px #1c1b18;
 	-webkit-box-shadow: 0px 1px 0px 0px #1c1b18;
 	box-shadow: 0px 1px 0px 0px #1c1b18;
@@ -143,7 +153,7 @@ button#save-button {
 	text-decoration:none;
 	text-shadow:0px 1px 0px #ffffff;
 }
-.myButton:hover {
+.button:hover {
 	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ccc2a6), color-stop(1, #eae0c2));
 	background:-moz-linear-gradient(top, #ccc2a6 5%, #eae0c2 100%);
 	background:-webkit-linear-gradient(top, #ccc2a6 5%, #eae0c2 100%);
@@ -153,7 +163,7 @@ button#save-button {
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ccc2a6', endColorstr='#eae0c2',GradientType=0);
 	background-color:#ccc2a6;
 }
-.myButton:active {
+.button:active {
 	position:relative;
 	top:1px;
 }

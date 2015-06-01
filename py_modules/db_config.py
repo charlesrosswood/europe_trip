@@ -150,9 +150,11 @@ class DatabaseConfig(object):
 
         with self.connection.cursor() as cursor:
             values_string = b','.join(cursor.mogrify("%s", (x, )) for x in values).decode('utf-8')
-            SQL_statement = insert_string + values_string
+            SQL_statement = insert_string + values_string.replace('ARRAY[', '(').replace(']',')')
+
             try:
                 cursor.execute(SQL_statement)
+                # cursor.executemany(SQL_statement % (values))
                 self.connection.commit()
                 response = ReturnStatus(return_value=None, status_code=201,
                     message='statement: ''"%s"' % (SQL_statement, ))
