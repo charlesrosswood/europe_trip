@@ -33,7 +33,7 @@ class DatabaseConfig(object):
 
     def __init__(self, host, dbname, user='postgres', password='postgres', port=5432):
         """
-        Use this to instatiate the Database config class
+        Use this to instantiate the Database config class
 
         :param host:
         :param dbname:
@@ -71,6 +71,8 @@ class DatabaseConfig(object):
             select_statement = 'SELECT %s FROM %s.%s' % (columns_to_select, schema, tablename)
 
         if where is not None:  # should be a list
+            if not isinstance(where, list):
+                where = [where]
             select_statement += ' WHERE %s' % (' AND '.join(where),)
 
         cleaned_records = []
@@ -91,7 +93,7 @@ class DatabaseConfig(object):
 
             db_cursor.close()
 
-        response = ReturnStatus(return_value=cleaned_records, status_code=True,
+        response = ReturnStatus(return_value=cleaned_records, status_code=200,
             message='statment: "%s"' % (select_statement,))
 
         return response.get_dict()
@@ -127,6 +129,8 @@ class DatabaseConfig(object):
     def insert_into_table(self, tablename, values, columns=None, schema=None):
         # TODO: suffers from SQL injections
         """
+        NOTE: This should return the IDs of the newly created rows
+
         :param tablename:
         :param values:
         :param columns:
@@ -150,11 +154,11 @@ class DatabaseConfig(object):
             try:
                 cursor.execute(SQL_statement)
                 self.connection.commit()
-                response = ReturnStatus(return_value=None, status_code=True,
+                response = ReturnStatus(return_value=None, status_code=201,
                     message='statement: ''"%s"' % (SQL_statement, ))
             except psycopg2.Error as e:
                 self.connection.rollback()
-                response = ReturnStatus(return_value=None, status_code=False,
+                response = ReturnStatus(return_value=None, status_code=500,
                     message='statement: "%s"' % (SQL_statement, ), error_message=e.pgerror)
 
         return response.get_dict()

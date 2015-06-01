@@ -1,4 +1,5 @@
-var HttpClient = require('./_http_client').HttpClient;
+var HttpClient = require('../common_modules/_http_client').HttpClient;
+var endPoints = require('../common_modules/_allowed_urls').endPoints;
 var searchBoxListener = require('./_places_changed_listener').searchBoxListener;
 var markerListener = require('./_marker_listener').markerListener;
 
@@ -48,16 +49,9 @@ function initialise() {
 
 google.maps.event.addDomListener(window, 'load', initialise);
 
-
 function saveRoute() {
-  var url = 'save-route';
-
-//  var aClient = new HttpClient();
-//  aClient.get(url, function(response) {
-//    console.log(response);
-//    var object = JSON.parse(response);
-//    console.log(object);
-//  });
+  var url = endPoints.saveRoute.url;
+  console.log(endPoints.readTable('testing').url);
 
   var aClient = new HttpClient();
   aClient.post(url, chosenPlaces, function(response) {
@@ -66,12 +60,8 @@ function saveRoute() {
   });
 
 }
-// Add to the chosen-places DOM node
 
-//document.getElementById('places-input').addEventListener('keypress', function(e) {
-//  var key = e.which || e.keyCode;
-//  if (key === 13) {
-//    console.log('enter_pressed!');
-//
-//  }
-//});
+
+// Add all listeners down here
+var save_route_button = document.getElementById('save-route-button');
+save_route_button.addEventListener("click", saveRoute);

@@ -23,8 +23,6 @@ var HttpClient = function() {
 
     anHttpRequest.open( "GET", aUrl, true );
 
-    anHttpRequest.setRequestHeader('Connection', 'close');
-
     anHttpRequest.send( null );
   }
 
