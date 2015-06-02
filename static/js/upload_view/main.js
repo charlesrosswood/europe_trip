@@ -5,18 +5,33 @@ var geolocationUpload= require('./_geolocation_upload').geolocationUpload;
 
 // Add all listeners down here
 var uploadPhoto = document.getElementById('upload-photo');
+
+// getting current timestamp with timezone
+
+var timeNow = new Date();
+var timeNowMs = timeNow.getTime()
+
 uploadPhoto.addEventListener("submit", function() {
 
   var ownerId = document.getElementById('user-details').value;
 
-  console.log(ownerId);
-  geolocationUpload(ownerId, function(response) {
-    var geolocationId = response.result[0].geolocations_id;
+  geolocationUpload(ownerId, timeNowMs, function(response, status) {
 
-    statusUpload(ownerId, geolocationId, function(response) {
+    var geolocationId = null;
+    if (status == 201) {
       var response = JSON.parse(response);
-      var statusId = response['result'][0]['status_entries_id']
-      uploadToImgur(ownerId, statusId, geolocationId);
+      geolocationId = response.result[0].geolocations_id;
+    }
+
+    statusUpload(ownerId, geolocationId, timeNowMs,  function(response, status) {
+
+      var statusId = null;
+      if (status == 201) {
+        var response = JSON.parse(response);
+        var statusId = response.result[0].status_entries_id
+      }
+
+      uploadToImgur(ownerId, statusId, geolocationId, timeNowMs);
     });
 
   });

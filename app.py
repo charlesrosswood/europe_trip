@@ -55,17 +55,27 @@ def index():
 
 @app.route('/upload', methods=['GET'])#, 'POST'])
 def upload():
-    # if request.method == 'POST':
-    #     file = request.files['fileField']
-    #     path_to_file = '/Users/cwod/Documents/GitHub/europe_trip3/' + file.filename
-    #     print('path_to_file', path_to_file)
-    #     file.save('/Users/cwod/Documents/GitHub/europe_trip3/' + file.filename)
-    #     return json.dumps(True), 200
-    # elif request.method == 'GET':
     all_users = users.User.get_all_users_from_db(db)
     return render_template('upload.html', context={'users': all_users}), 200
-    # else:
-    #     abort(405)
+
+@app.route('/view-uploads', methods=['GET'])
+def view_uploads():
+    user_uploads = users.User.get_all_users_uploads(db)
+
+    def find_photo(users_uploads):
+        for user in users_uploads:
+            if user['photo_uploads']:
+                for photo in user['photo_uploads']:
+                    return photo['image_url']
+            else:
+                return None
+    init_photo = find_photo(user_uploads)
+
+    context = {
+        'users': user_uploads,
+        'init_photo': init_photo
+    }
+    return render_template('view_uploads.html', context=context)
 
 @app.route('/map', methods=['GET'])
 def map():
@@ -126,11 +136,15 @@ def write(tablename):
     except:  # TODO: catch all exception!
         abort(500)
 
-@app.route('/save-route', methods=['POST'])
+@app.route('/save-route', methods=['GET'])
 def save_route():
-    request_data = json.loads(decode_request(request))
-    print(request_data)
+    # request_data = json.loads(decode_request(request))
+    # print(request_data)
 
+    from datetime import datetime
+    now = datetime.now()
+    print(now)
+    db.insert_into_table('geolocations', [[now]], ['entry_timestamp'],)
     return json.dumps(True), 201
 
 
@@ -140,7 +154,7 @@ def forbidden(e):
     return render_template('errors/400.html'), 400
 
 @app.errorhandler(403)
-def forbidden(e):
+def bad_request(e):
     return render_template('errors/403.html'), 403
 
 @app.errorhandler(404)

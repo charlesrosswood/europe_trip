@@ -74,7 +74,7 @@ class DatabaseConfig(object):
             if not isinstance(where, list):
                 where = [where]
             select_statement += ' WHERE %s' % (' AND '.join(where),)
-
+        print(select_statement)
         cleaned_records = []
         with self.connection.cursor() as db_cursor:
             db_cursor.execute(select_statement)
@@ -94,7 +94,7 @@ class DatabaseConfig(object):
             db_cursor.close()
 
         response = ReturnStatus(return_value=cleaned_records, status_code=200,
-            message='statment: "%s"' % (select_statement,))
+            message='statement: "%s"' % (select_statement,))
 
         return response.get_dict()
 
@@ -153,12 +153,18 @@ class DatabaseConfig(object):
             SQL_statement = insert_string + values_string.replace('ARRAY[', '(').replace(']',')')
 
             #  adding returning the table id
-            SQL_statement += ' RETURNING %s' % (tablename+'_id',)
+            tablename_id = tablename+'_id'
+            SQL_statement += ' RETURNING %s' % (tablename_id,)
             try:
                 cursor.execute(SQL_statement)
                 # cursor.executemany(SQL_statement % (values))
+                row_id = cursor.fetchone()[0]
+
+                return_dict = [{
+                    tablename_id: row_id
+                }]
                 self.connection.commit()
-                response = ReturnStatus(return_value=None, status_code=201,
+                response = ReturnStatus(return_value=return_dict, status_code=201,
                     message='statement: ''"%s"' % (SQL_statement, ))
             except psycopg2.Error as e:
                 self.connection.rollback()

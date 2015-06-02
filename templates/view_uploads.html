@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+	<head profile="http://www.w3.org/2005/10/profile">
+		<meta charset="UTF-8">
+		<!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+		<title>Upload images</title>
+
+		<link rel="icon"
+			  type="image/png"
+			  sizes="96x96"
+			  href="{{ url_for('static', filename='images/favicons/favicon-96x96.png') }}">
+
+		<link rel='stylesheet' type='text/css'
+			  href="{{ url_for('static', filename='css/layout.css') }}">
+
+		<link rel='stylesheet' type='text/css'
+			  href="{{ url_for('static', filename='css/view_uploads_layout.css') }}">
+
+		<link rel='stylesheet' type='text/css'
+			  href="{{ url_for('static', filename='css/colours.css') }}">
+
+		<link rel='stylesheet' type='text/css'
+			  href="{{ url_for('static', filename='css/transitions.css') }}">
+
+		<link rel='stylesheet'
+			  type='text/css'
+			  href='http://fonts.googleapis.com/css?family=Anton'>
+
+		<link  rel='stylesheet'
+			   type='text/css'
+			   href='http://fonts.googleapis.com/css?family=Lato:400,700'>
+
+		<script type="text/javascript"
+				src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7oYhGu2nYJUFZOEVh1Z7qdpjlriSzdEc&libraries=places,drawing">
+		</script>
+
+
+	</head>
+
+    <body class="background-color-0">
+
+		<div id="header-container" class="color-6">
+			<div class="header margin-left-5 delayed-fade-in">
+				#europe2015
+			</div>
+			<div class="slide-in-from-right hline background-color-1a margin-left-5"></div>
+		</div>
+
+        <div class="margin-top-10-percent color-6 margin-left-5 delayed-fade-in body-font">
+            {% for user in context.users %}
+                <!--{{ user }}-->
+                <div class="user-heading">{{ user.name }}</div>
+                <div class="hline background-color-1a"></div>
+                <div>
+                    Photos:
+                    <div class="x-carousel">
+                        {% for photo in user.photo_uploads %}
+                            <img src="{{ photo.image_url }}" class="thumbnail"
+                                 id="{{ photo.photo_uploads_id }}">
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div>
+                    Locations:
+                    <div class="x-carousel">
+                        {% for location in user.geolocations %}
+                            <p class="locations">
+                                lat: {{ location.latitude }}
+                                <br/>
+                                lon: {{location.longitude}}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div>
+                    Posts:
+                    <div class="x-carousel">
+                        {% for post in user.status_entries %}
+                            <p class="post">
+                                {{ post.status_entry }}
+                            </p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            {% endfor %}
+
+            <div class="hline background-color-1a"></div>
+            <div>
+                <img id="img-preview" src="{{ context.init_photo }}"
+                     class="img-preview horiz-center">
+            </div>
+        </div>
+
+    </body>
+	<script type="text/javascript"
+		src="{{ url_for('static', filename='js/view_uploads_view/view_uploads_view_bundle.js') }}"></script>
+
+</html>

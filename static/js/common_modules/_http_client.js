@@ -17,8 +17,8 @@ var HttpClient = function() {
   this.get = function(aUrl, aCallback) {
     var anHttpRequest = new XMLHttpRequest();
     anHttpRequest.onreadystatechange = function() {
-      if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
-        aCallback(anHttpRequest.responseText);
+      if (anHttpRequest.readyState == 4)
+        aCallback(anHttpRequest.responseText, anHttpRequest.status);
     }
 
     anHttpRequest.open( "GET", aUrl, true );
@@ -29,8 +29,9 @@ var HttpClient = function() {
   this.post = function(aUrl, bodyData, aCallback) {
     var anHttpRequest = new XMLHttpRequest();
     anHttpRequest.onreadystatechange = function() {
-      if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
-        aCallback(anHttpRequest.responseText);
+      if (anHttpRequest.readyState == 4) {
+        aCallback(anHttpRequest.responseText, anHttpRequest.status);
+      }
     }
 
     anHttpRequest.open( "POST", aUrl, true );
@@ -50,8 +51,8 @@ var HttpClient = function() {
     var anHttpRequest = new XMLHttpRequest();
 
     anHttpRequest.onreadystatechange = function() {
-      if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
-        aCallback(anHttpRequest.responseText);
+      if (anHttpRequest.readyState == 4)
+        aCallback(anHttpRequest.responseText, anHttpRequest.status);
     }
 
     anHttpRequest.open('POST', aUrl);

@@ -6,18 +6,33 @@ var geolocationUpload= require('./_geolocation_upload').geolocationUpload;
 
 // Add all listeners down here
 var uploadPhoto = document.getElementById('upload-photo');
+
+// getting current timestamp with timezone
+
+var timeNow = new Date();
+var timeNowMs = timeNow.getTime()
+
 uploadPhoto.addEventListener("submit", function() {
 
   var ownerId = document.getElementById('user-details').value;
 
-  console.log(ownerId);
-  geolocationUpload(ownerId, function(response) {
-    var geolocationId = response.result[0].geolocations_id;
+  geolocationUpload(ownerId, timeNowMs, function(response, status) {
 
-    statusUpload(ownerId, geolocationId, function(response) {
+    var geolocationId = null;
+    if (status == 201) {
       var response = JSON.parse(response);
-      var statusId = response['result'][0]['status_entries_id']
-      uploadToImgur(ownerId, statusId, geolocationId);
+      geolocationId = response.result[0].geolocations_id;
+    }
+
+    statusUpload(ownerId, geolocationId, timeNowMs,  function(response, status) {
+
+      var statusId = null;
+      if (status == 201) {
+        var response = JSON.parse(response);
+        var statusId = response.result[0].status_entries_id
+      }
+
+      uploadToImgur(ownerId, statusId, geolocationId, timeNowMs);
     });
 
   });
@@ -123,8 +138,8 @@ var HttpClient = function() {
   this.get = function(aUrl, aCallback) {
     var anHttpRequest = new XMLHttpRequest();
     anHttpRequest.onreadystatechange = function() {
-      if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
-        aCallback(anHttpRequest.responseText);
+      if (anHttpRequest.readyState == 4)
+        aCallback(anHttpRequest.responseText, anHttpRequest.status);
     }
 
     anHttpRequest.open( "GET", aUrl, true );
@@ -135,8 +150,9 @@ var HttpClient = function() {
   this.post = function(aUrl, bodyData, aCallback) {
     var anHttpRequest = new XMLHttpRequest();
     anHttpRequest.onreadystatechange = function() {
-      if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
-        aCallback(anHttpRequest.responseText);
+      if (anHttpRequest.readyState == 4) {
+        aCallback(anHttpRequest.responseText, anHttpRequest.status);
+      }
     }
 
     anHttpRequest.open( "POST", aUrl, true );
@@ -156,8 +172,8 @@ var HttpClient = function() {
     var anHttpRequest = new XMLHttpRequest();
 
     anHttpRequest.onreadystatechange = function() {
-      if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
-        aCallback(anHttpRequest.responseText);
+      if (anHttpRequest.readyState == 4)
+        aCallback(anHttpRequest.responseText, anHttpRequest.status);
     }
 
     anHttpRequest.open('POST', aUrl);
@@ -177,30 +193,39 @@ var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
 
 // Allowspicture uplaod to Imgur
-var geolocationUpload = function(ownerId, callback) {
+var geolocationUpload = function(ownerId, timeNowMs, callback) {
 
   var geolocationDiv = document.getElementById('geolocation');
+  var placeNameDiv = document.getElementById('placename-input');
+
   var lng = geolocationDiv.getAttribute('data-longitude');
   var lat = geolocationDiv.getAttribute('data-latitude');
 
-  var placeNameDiv = document.getElementById('placename-input');
-  var placename = placeNameDiv.value;
-
-  if ((lng!=null || lng!='') && (lat!=null || lng!='')) {
+  if (lng !== null) {
     lng = Number(lng);
-    lat = Number(lat);
-    var bodyJson = {
-      columns: ['users_id', 'name', 'latitude', 'longitude'],
-      values: [[ownerId, placename, lat, lng]]
-    };
-    var aClient = new HttpClient();
-
-    aClient.post(endPoints.writeTable('geolocations').url, bodyJson, callback);
   } else {
-    callback({
-      result: [{geolocaions_id:null}]
-    });
+    lng = -1000;
   }
+
+  if (lat !== null) {
+    lat = Number(lat);
+  } else {
+    lat = -1000;
+  }
+
+
+  var placename = null;
+  if (placeNameDiv !== null) {
+    placename = placeNameDiv.value;
+  }
+
+  var bodyJson = {
+    columns: ['users_id', 'name', 'latitude', 'longitude', 'entry_timestamp'],
+    values: [[ownerId, placename, lat, lng, timeNowMs]]
+  };
+  var aClient = new HttpClient();
+
+  aClient.post(endPoints.writeTable('geolocations').url, bodyJson, callback);
 
 }
 
@@ -211,7 +236,7 @@ var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
 
 // Allowspicture uplaod to Imgur
-var uploadToImgur = function(ownerId, statusId, geolocationId) {
+var uploadToImgur = function(ownerId, statusId, geolocationId, timeNowMs) {
   console.log('uploading...');
 
   var form3 = document.getElementById('file-field');
@@ -231,12 +256,14 @@ var uploadToImgur = function(ownerId, statusId, geolocationId) {
       var bClient = new HttpClient();
 
       var tableData = {
-        'columns' :['users_id', 'geolocations_id', 'image_url', 'delete_hash', 'status_entries_id'],
-        'values': [[ownerId, geolocationId, imgurUrl, imgurDeleteHash, statusId]]
+        'columns' :['users_id', 'geolocations_id', 'image_url', 'delete_hash',
+        'status_entries_id', 'entry_timestamp'],
+        'values': [[ownerId, geolocationId, imgurUrl, imgurDeleteHash, statusId, timeNowMs]]
       };
 
-      bClient.post(endPoints.writeTable('photo_uploads').url, tableData, function(response) {
-        console.log(response);
+      bClient.post(endPoints.writeTable('photo_uploads').url, tableData, function(response,
+      status) {
+        console.log(response, status);
       });
 
     });
@@ -271,14 +298,15 @@ var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
 
 // Allowspicture uplaod to Imgur
-var statusUpload = function(ownerId, geolocationId, callback) {
+var statusUpload = function(ownerId, geolocationId, timeNowMs, callback) {
   console.log('uploading...');
 
-  var statusText = document.getElementById('status-text');
+  var statusDiv = document.getElementById('status-text');
+  var statusText = statusDiv.value;
 
   var bodyJson = {
-    columns: ['users_id', 'geolocations_id', 'status_entry'],
-    values: [[ownerId, geolocationId, statusText.value]]
+    columns: ['users_id', 'geolocations_id', 'status_entry', 'entry_timestamp'],
+    values: [[ownerId, geolocationId, statusText, timeNowMs]]
   };
 
   var aClient = new HttpClient();

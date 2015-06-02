@@ -1,5 +1,7 @@
 __author__ = 'cwod'
 
+from operator import itemgetter
+
 
 class User(object):
 
@@ -11,22 +13,23 @@ class User(object):
         users_where_string = ["username='%s'" % (self.username)]
         users_results = db.select_from_table('users', where=users_where_string)
 
-        if users_results['result'].length > 1:
+        if len(users_results['result']) > 1:
             return None
         else:
             users_details = users_results['result'][0]
             users_profiles_where_string = ["users_id='%s'" % (users_details[
                                                                   'users_id'],)]
             user_profile_results = db.select_from_table('user_profiles',
-                users_profiles_where_string)
+                where=users_profiles_where_string)
             profile_details = user_profile_results['result'][0]
-
+            print(profile_details)
             self.user_id = users_details['users_id']
             self.email = users_details['email']
             self.first_name = profile_details['first_name']
             self.first_name = profile_details['last_name']
 
             return self
+
     @staticmethod
     def get_all_users_from_db(db):
         users_results = db.select_from_table('users')
@@ -59,3 +62,35 @@ class User(object):
 
                 user_list.append(user_dict)
             return user_list
+
+    def get_user_uploads(self, db):
+        tablenames = [
+            'geolocations',
+            'photo_uploads',
+            'status_entries'
+        ]
+
+        users_uploads = {}
+
+        for table in tablenames:
+            where_string = ["users_id='%s'" % (self.user_id)]
+            db_result= db.select_from_table(table, where=where_string)
+            results = db_result['result']
+            users_uploads[table] = sorted(results, key=itemgetter('entry_timestamp'), reverse=True)
+
+        return users_uploads
+
+    @staticmethod
+    def get_all_users_uploads(db):
+        user_list = User.get_all_users_from_db(db)
+
+        user_uploads_list = []
+        if user_list:
+            for user in user_list:
+                provisional_user = User(user['username'])
+                current_user = provisional_user.get_user_from_db(db)
+                user_uploads = current_user.get_user_uploads(db)
+                user.update(user_uploads)
+                user_uploads_list.append(user)
+
+        return user_uploads_list
