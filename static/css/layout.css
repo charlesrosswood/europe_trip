@@ -68,6 +68,10 @@ p {
   margin-left: 5%;
 }
 
+.margin-top-10-percent {
+  margin-top: 10%;
+}
+
 .hline {
   width: 100%;
   height: 1px;

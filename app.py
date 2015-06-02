@@ -2,20 +2,13 @@ __author__ = 'cwod'
 
 from flask import Flask
 from flask import render_template
-from flask import redirect
-from flask import url_for
-from flask.ext.login import LoginManager
-from flask.ext.login import login_required
-from flask.ext.login import login_user
 import py_modules.db_config as database
 import json
 from flask import request
 from flask import abort
 import platform
 import os
-import hashlib
-import uuid
-import py_modules.user_login_registration as user_login_registration
+import py_modules.users as users
 
 if platform.system() in ['Windows', 'Darwin']:  # local dev server
     _HOST_ = 'localhost'
@@ -40,39 +33,6 @@ db = database.DatabaseConfig(host=_HOST_, dbname=_DBNAME_, user=_USER_,
 
 app = Flask(__name__)
 
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-@login_manager.request_loader
-def load_user(request):
-    """
-    This function is to load a user if the credentials match the DB
-
-    :param request:
-    :return:
-    """
-    # the token is either the Authorization header or...
-    token = request.headers.get('Authorization')
-    if token is None:
-        # ...the token is a URL parameter
-        token = request.args.get('token')
-
-    if token is not None:
-        username,password = token.split(':')
-
-        password_salt = uuid.uuid4().hex
-        password_hash = hashlib.sha512(password_salt + password).hexdigest()
-
-        where_clauses = ['password hash="%s"' % (password_hash,), 'username="%s"' % (username,)]
-        user_response = db.select_from_table('users', where=where_clauses)
-        print(user_response)
-
-        #TODO do something with makeing a User object if necessary
-        if user_response is not None:
-            return user_response
-
-    return None
-
 def decode_request(request_obj):
     con_type = request_obj.content_type
     charset = 'charset='
@@ -89,57 +49,23 @@ def decode_request(request_obj):
 
     return request.data.decode(required_codec)
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    form = user_login_registration.RegistrationForm(request.form)
-    if request.method == 'POST' and form.validate_form(db):
-
-        user = user_login_registration.User(username=form.username.data,
-            password=form.password.data)
-        db.insert_into_table('users', columns=['username', 'password_hash', 'password_salt'],
-            values=[[user.username, user.password_hash, user.salt]])
-
-        return redirect(url_for('login'))
-    return render_template('login_register/register.html', form=form)
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    # Here we use a class of some kind to represent and validate our
-    # client-side form data. For example, WTForms is a library that will
-    # handle this for us.
-    form = user_login_registration.LoginForm()
-    if form.validate():
-        print(form.__dict__)
-        # Login and validate the user.
-        login_user(user)
-
-        next = request.args.get('next')
-        print(next)
-        if not next_is_valid(next):
-            return abort(400)
-
-        return redirect(next or url_for('index'))
-    return render_template('login_register/login.html', form=form)
-
 @app.route('/index', methods=['GET'])
-@login_required
 def index():
     return render_template('index.html'), 200
 
-@app.route('/upload', methods=['GET', 'POST'])
+@app.route('/upload', methods=['GET'])#, 'POST'])
 def upload():
-    if request.method == 'POST':
-        print(request.files)
-        file = request.files['fileField']
-        print(file)
-        path_to_file = '/Users/cwod/Documents/GitHub/europe_trip3/' + file.filename
-        print('path_to_file', path_to_file)
-        file.save('/Users/cwod/Documents/GitHub/europe_trip3/' + file.filename)
-        return json.dumps(True), 200
-    elif request.method == 'GET':
-        return render_template('upload.html'), 200
-    else:
-        abort(405)
+    # if request.method == 'POST':
+    #     file = request.files['fileField']
+    #     path_to_file = '/Users/cwod/Documents/GitHub/europe_trip3/' + file.filename
+    #     print('path_to_file', path_to_file)
+    #     file.save('/Users/cwod/Documents/GitHub/europe_trip3/' + file.filename)
+    #     return json.dumps(True), 200
+    # elif request.method == 'GET':
+    all_users = users.User.get_all_users_from_db(db)
+    return render_template('upload.html', context={'users': all_users}), 200
+    # else:
+    #     abort(405)
 
 @app.route('/map', methods=['GET'])
 def map():
@@ -176,7 +102,10 @@ def write(tablename):
     }
 
     :return:
+
     """
+    # TODO: make sure we return the id of the inserted row
+
     payload = json.loads(decode_request(request))
     print(payload)
     try:
@@ -191,7 +120,7 @@ def write(tablename):
             values=values,
             columns=columns
         )
-
+        print(insert_success)
         return json.dumps(insert_success), insert_success['status']
 
     except:  # TODO: catch all exception!

@@ -152,6 +152,8 @@ class DatabaseConfig(object):
             values_string = b','.join(cursor.mogrify("%s", (x, )) for x in values).decode('utf-8')
             SQL_statement = insert_string + values_string.replace('ARRAY[', '(').replace(']',')')
 
+            #  adding returning the table id
+            SQL_statement += ' RETURNING %s' % (tablename+'_id',)
             try:
                 cursor.execute(SQL_statement)
                 # cursor.executemany(SQL_statement % (values))

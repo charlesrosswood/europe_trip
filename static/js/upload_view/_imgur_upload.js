@@ -2,7 +2,7 @@ var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
 
 // Allowspicture uplaod to Imgur
-var uploadToImgur = function(owner, statusId) {
+var uploadToImgur = function(ownerId, statusId, geolocationId) {
   console.log('uploading...');
 
   var form3 = document.getElementById('file-field');
@@ -22,8 +22,8 @@ var uploadToImgur = function(owner, statusId) {
       var bClient = new HttpClient();
 
       var tableData = {
-        'columns' :['uploader', 'image_url', 'status_entry', 'delete_hash'],
-        'values': [[owner, imgurUrl, statusId, imgurDeleteHash]]
+        'columns' :['users_id', 'geolocations_id', 'image_url', 'delete_hash', 'status_entries_id'],
+        'values': [[ownerId, geolocationId, imgurUrl, imgurDeleteHash, statusId]]
       };
 
       bClient.post(endPoints.writeTable('photo_uploads').url, tableData, function(response) {
