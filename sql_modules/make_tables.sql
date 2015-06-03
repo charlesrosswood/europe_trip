@@ -1,56 +1,42 @@
---Creating the user table
+-- Creating the user table
 CREATE TABLE users
 (
-  users_id serial NOT NULL,
-  username varchar(200) NOT NULL CHECK (username <> ''),
-  email varchar(254),
-  password_hash varchar(512),
-  password_salt varchar(512),
-  CONSTRAINT users_pkey PRIMARY KEY (users_id)
+  id serial NOT NULL,
+  username CHARACTER VARYING(200) CHECK (username <> '') NOT NULL,
+  email CHARACTER VARYING(254),
+  password_hash CHARACTER VARYING(512),
+  password_salt CHARACTER VARYING(512),
+  CONSTRAINT users_pkey PRIMARY KEY (id)
 );
 
---Creating the user table
+-- Creating the user table
 CREATE TABLE user_profiles
 (
-  user_profiles_id serial NOT NULL,
-  users_id integer REFERENCES users,
-  first_name varchar(200),
-  last_name varchar(254),
-  CONSTRAINT user_profiles_pkey PRIMARY KEY (user_profiles_id)
+  id serial NOT NULL,
+  users_id INTEGER REFERENCES users,
+  first_name CHARACTER VARYING(200),
+  last_name CHARACTER VARYING(254),
+  CONSTRAINT user_profiles_pkey PRIMARY KEY (id)
 );
 
---Creating the photo upload table
-CREATE TABLE geolocations
+-- Create the main data table
+CREATE TABLE posts
 (
-  geolocations_id serial NOT NULL,
-  users_id integer REFERENCES users, -- FK to user table
-  name varchar(500),
-  latitude decimal NOT NULL CHECK (latitude > -90) CHECK (latitude < 90),
-  longitude decimal NOT NULL CHECK (longitude > -180) CHECK (longitude < 180),
-  entry_timestamp bigint, -- ms epoch times
-  CONSTRAINT geolocations_pkey PRIMARY KEY (geolocations_id)
-);
+  id SERIAL NOT NULL,
+  user_id INTEGER REFERENCES users NOT NULL,
 
---Creating the  table
-CREATE TABLE status_entries
-(
-  status_entries_id serial NOT NULL,
-  users_id integer REFERENCES users, -- FK to user table
-  geolocations_id integer REFERENCES geolocations, -- FK to geolocations table
-  status_entry varchar(5000) NOT NULL CHECK (status_entry <> ''),
-  entry_timestamp bigint, -- ms epoch times
-  CONSTRAINT status_entries_pkey PRIMARY KEY (status_entries_id)
-);
+  -- geolocation data
+  latitude DECIMAL CHECK (latitude > -90) CHECK (latitude < 90),
+  longitude DECIMAL CHECK (longitude > -180) CHECK (longitude < 180),
 
---Creating the photo upload table
-CREATE TABLE photo_uploads
-(
-  photo_uploads_id serial NOT NULL,
-  users_id integer REFERENCES users, -- FK to user table
-  geolocations_id integer REFERENCES geolocations, -- FK to geolocations table
-  image_url character varying(200) NOT NULL CHECK (image_url <> ''),
-  delete_hash character varying(200),
-  status_entries_id integer REFERENCES status_entries, -- FK to status_entries table
-  entry_timestamp bigint, -- ms epoch times
-  CONSTRAINT photo_uploads_pkey PRIMARY KEY (photo_uploads_id)
+  post_timestamp BIGINT, -- in ms since epoch
+
+  -- image upload info
+  image_url CHARACTER VARYING(200) CHECK (image_url <> ''),
+  image_deletehash  CHARACTER VARYING(200) CHECK (image_deletehash <> ''),
+
+  -- a status entry (like a post)
+  status_entry CHARACTER VARYING(5000) CHECK (status_entry <> ''),
+
+  CONSTRAINT posts_pkey PRIMARY KEY (id)
 );
