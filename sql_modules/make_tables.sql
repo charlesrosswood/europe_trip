@@ -29,7 +29,7 @@ CREATE TABLE posts
   latitude NUMERIC CHECK (latitude > -90) CHECK (latitude < 90),
   longitude NUMERIC CHECK (longitude > -180) CHECK (longitude < 180),
 
-  post_timestamp BIGINT CHECK (post_timestamp <> 0) CHECK (post_timestamp <> '') NOT NULL ,
+  post_timestamp BIGINT CHECK (post_timestamp <> 0) NOT NULL ,
   -- in ms since epoch
 
   -- image upload info
