@@ -26,8 +26,8 @@ CREATE TABLE posts
   user_id INTEGER REFERENCES users NOT NULL,
 
   -- geolocation data
-  latitude DECIMAL CHECK (latitude > -90) CHECK (latitude < 90),
-  longitude DECIMAL CHECK (longitude > -180) CHECK (longitude < 180),
+  latitude NUMERIC CHECK (latitude > -90) CHECK (latitude < 90),
+  longitude NUMERIC CHECK (longitude > -180) CHECK (longitude < 180),
 
   post_timestamp BIGINT, -- in ms since epoch
 

@@ -1,0 +1,42 @@
+.nav-item {
+  width: calc(33% - 24px);
+  margin-left: 12px;
+  margin-right: 12px;
+  /*float: left;*/
+  font-family: 'Lato', sans-serif;
+  font-size: 20px;
+  display: inline-block;
+  text-align: center;
+}
+
+.nav-pane {
+  display: block;
+}
+
+.phone {
+  display: none;
+}
+
+/* making the nav-pane responsive to phones */
+@media (max-width: 745px) {
+  .nav-item {
+    width: calc(100% - 24px);
+    display: none;
+    margin-top: 6px;
+    margin-bottom: 6px;
+  }
+
+  .phone {
+    display: block;
+  }
+
+  .nav-item.active {
+    display: block;
+  }
+
+  .menu {
+    display: block;
+  }
+
+
+}

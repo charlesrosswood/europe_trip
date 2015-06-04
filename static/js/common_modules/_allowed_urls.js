@@ -6,6 +6,11 @@ var endPoints = (function() {
       methods: ['POST']
     },
 
+    getUpdatedPosts: {
+      url: 'get-updated-posts',
+      methods: ['GET']
+    },
+
     upload: {
       url: 'upload',
       methods: ['GET', 'POST']

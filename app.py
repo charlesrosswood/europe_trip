@@ -49,6 +49,11 @@ def decode_request(request_obj):
 
     return request.data.decode(required_codec)
 
+# Views that render templates
+@app.route('/', methods=['GET'])
+def map_posts():
+    return render_template('map_posts.html'), 200
+
 @app.route('/index', methods=['GET'])
 def index():
     return render_template('index.html'), 200
@@ -80,6 +85,17 @@ def view_uploads():
 @app.route('/map', methods=['GET'])
 def map():
     return render_template('map.html'), 200
+
+# RESTful views that act as APIs
+@app.route('/get-updated-posts', methods=['GET'])
+def update_posts():
+    user_uploads = users.User.get_all_users_uploads(db)
+    context = {
+        'users': user_uploads
+    }
+
+    print(user_uploads)
+    return json.dumps(context), 200
 
 
 # RESTful database methods

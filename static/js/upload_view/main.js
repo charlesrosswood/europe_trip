@@ -21,11 +21,13 @@ uploadPost.addEventListener("submit", function() {
   var statusDiv = document.getElementById('status-text');
   var statusText = statusDiv.value;
 
+  // TODO: 1. make post with status text and user, 2. update if position, 3. update if imgurURL
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
 
       lat = position.coords.latitude;
       lng = position.coords.longitude;
+
 
   //    var placeNameNode = document.createElement('input');
   //    placeNameNode.setAttribute('placeholder', 'Placename...');

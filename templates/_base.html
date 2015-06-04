@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+	<head profile="http://www.w3.org/2005/10/profile">
+		<meta charset="UTF-8">
+		<!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+		<title>{% block title %}{% endblock %}</title>
+
+		<link rel="icon"
+			  type="image/png"
+			  sizes="96x96"
+			  href="{{ url_for('static', filename='images/favicons/favicon-96x96.png') }}">
+
+		<link rel='stylesheet' type='text/css'
+			  href="{{ url_for('static', filename='css/layout.css') }}">
+
+		<link rel='stylesheet' type='text/css'
+			  href="{{ url_for('static', filename='css/colours.css') }}">
+
+		<link rel='stylesheet' type='text/css'
+			  href="{{ url_for('static', filename='css/transitions.css') }}">
+
+        <link rel='stylesheet' type='text/css'
+			  href="{{ url_for('static', filename='css/navigation.css') }}">
+
+		<link rel='stylesheet'
+			  type='text/css'
+			  href='http://fonts.googleapis.com/css?family=Anton'>
+
+		<link  rel='stylesheet'
+			   type='text/css'
+			   href='http://fonts.googleapis.com/css?family=Lato:400,700'>
+
+        {% block head_scripts %}
+        {% endblock %}
+	</head>
+
+    <body class="background-color-0">
+        {% block nav_header %}
+        <div id="header-container" class="color-6">
+            <div class="margin-left-5 delayed-fade-in">
+                #europe2015
+            </div>
+        </div>
+		<div class="slide-in-from-right hline background-color-1a"></div>
+
+		<div class="nav-pane">
+			<div class="delayed-fade-in color-6">
+				<div class="menu phone nav-item background-color-2">menu</div>
+				<!-- navigation bar goes here-->
+				<div href="{{ url_for('index') }}" class="nav-item background-color-2">home</div>
+				<div href="{{ url_for('map') }}" class="nav-item background-color-2">map</div>
+				<div href="{{ url_for('upload') }}" class="nav-item background-color-2">upload
+				</div>
+			</div>
+			<div class="phone slide-in-from-right hline background-color-1a"></div>
+		</div>
+
+        {% endblock %}
+
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+
+    </body>
+	<script type="text/javascript"
+		src="{{ url_for('static', filename='js/base_view/base_view_bundle.js') }}"></script>
+	{% block tail_scripts %}{% endblock %}
+
+</html>
