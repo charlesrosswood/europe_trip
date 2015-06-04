@@ -13,7 +13,7 @@ CREATE TABLE users
 CREATE TABLE user_profiles
 (
   id serial NOT NULL,
-  users_id INTEGER REFERENCES users,
+  user_id INTEGER REFERENCES users,
   first_name CHARACTER VARYING(200),
   last_name CHARACTER VARYING(254),
   CONSTRAINT user_profiles_pkey PRIMARY KEY (id)
@@ -29,7 +29,8 @@ CREATE TABLE posts
   latitude NUMERIC CHECK (latitude > -90) CHECK (latitude < 90),
   longitude NUMERIC CHECK (longitude > -180) CHECK (longitude < 180),
 
-  post_timestamp BIGINT, -- in ms since epoch
+  post_timestamp BIGINT CHECK (post_timestamp <> 0) CHECK (post_timestamp <> '') NOT NULL ,
+  -- in ms since epoch
 
   -- image upload info
   image_url CHARACTER VARYING(200) CHECK (image_url <> ''),

@@ -11,6 +11,7 @@
 
 .nav-pane {
   display: block;
+  margin-bottom: 6px;
 }
 
 .phone {
@@ -19,6 +20,10 @@
 
 /* making the nav-pane responsive to phones */
 @media (max-width: 745px) {
+  .nav-pane {
+    margin-bottom: 0px;
+  }
+
   .nav-item {
     width: calc(100% - 24px);
     display: none;

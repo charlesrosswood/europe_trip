@@ -3,7 +3,7 @@ __author__ = 'cwod'
 from flask import Flask
 from flask import render_template
 import py_modules.db_config as database
-import json
+import simplejson as json
 from flask import request
 from flask import abort
 import platform
@@ -12,7 +12,7 @@ import py_modules.users as users
 
 if platform.system() in ['Windows', 'Darwin']:  # local dev server
     _HOST_ = 'localhost'
-    _DBNAME_ = 'postgres'
+    _DBNAME_ = 'cwod'
     _USER_ = 'cwod'
     _PASSWORD_ = ''
 

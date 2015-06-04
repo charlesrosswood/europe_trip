@@ -17,13 +17,12 @@ class User(object):
             return None
         else:
             users_details = users_results['result'][0]
-            users_profiles_where_string = ["users_id='%s'" % (users_details[
-                                                                  'users_id'],)]
+            users_profiles_where_string = ["user_id='%s'" % (users_details['id'],)]
             user_profile_results = db.select_from_table('user_profiles',
                 where=users_profiles_where_string)
             profile_details = user_profile_results['result'][0]
             print(profile_details)
-            self.user_id = users_details['users_id']
+            self.user_id = users_details['id']
             self.email = users_details['email']
             self.first_name = profile_details['first_name']
             self.first_name = profile_details['last_name']
@@ -42,9 +41,9 @@ class User(object):
 
             user_list = []
             for user in users_results['result']:
-                user_id = user['users_id']
+                user_id = user['id']
                 user_profile = next((profile for profile in profile_details if profile[
-                    'users_id']==user_id), {})
+                    'user_id']==user_id), {})
                 user_dict = {
                     'username': user['username'],
                     'user_id': user_id,
@@ -64,26 +63,20 @@ class User(object):
             return user_list
 
     def get_user_uploads(self, db):
-        tablenames = [
-            'geolocations',
-            'photo_uploads',
-            'status_entries'
-        ]
 
         users_uploads = {}
 
-        for table in tablenames:
-            where_string = ["users_id='%s'" % (self.user_id)]
-            db_result= db.select_from_table(table, where=where_string)
-            results = db_result['result']
-            users_uploads[table] = sorted(results, key=itemgetter('entry_timestamp'), reverse=True)
+        where_string = ["user_id='%s'" % (self.user_id)]
+        db_result= db.select_from_table('posts', where=where_string)
+        results = db_result['result']
+        users_uploads['posts'] = sorted(results, key=itemgetter('post_timestamp'), reverse=True)
 
         return users_uploads
 
     @staticmethod
     def get_all_users_uploads(db):
         user_list = User.get_all_users_from_db(db)
-
+        print(user_list)
         user_uploads_list = []
         if user_list:
             for user in user_list:

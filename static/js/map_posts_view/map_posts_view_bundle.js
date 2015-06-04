@@ -17,7 +17,6 @@ function getNewUserPosts() {
       var userPosts = JSON.parse(response);
 
       // TODO: render the x-carousel at the bottom of the page with the posts in
-
       initialiseGMaps(userPosts);
     } else {
       // TODO: render error
@@ -40,15 +39,18 @@ function initialiseGMaps(userPosts) {
 
   var searchBox = new google.maps.places.SearchBox(input); // turn the HTML input into places search
 
-  for (var i = 0; i < userPosts.users; i++) {
-    var user = userPosts[i];
-    var geolocations = user.geolocations;
+  console.log(userPosts);
+  //  for every user
+  for (var i = 0; i < userPosts.users.length; i++) {
+    var user = userPosts.users[i];
+    var posts = user.posts;
 
-    for (var j = 0; j < geolocations.length; j++) {
-      var location = geolocations[j];
-
+    // for every post by that user
+    for (var j = 0; j < posts.length; j++) {
+      var post = posts[j];
+      console.log(post);
       var marker = new google.maps.Marker({
-        position: new google.maps.LatLng(location.latitude, location.longitude),
+        position: new google.maps.LatLng(post.latitude, post.longitude),
         map: map,
         title: user.name
       });
