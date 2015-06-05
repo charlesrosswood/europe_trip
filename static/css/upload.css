@@ -1,0 +1,45 @@
+.upload-img-prev {
+  width: 50%;
+}
+
+.upload-page {
+  font-family: 'Lato', sans-serif;
+  font-size: 20px;
+}
+
+.form-element {
+  width: 100%;
+}
+
+label {
+  width: 100%;
+  text-align: center;
+  display: block;
+}
+
+input, textarea, select, button {
+  width : 50%%;
+  margin-left: 25%;
+  margin-right: 25%;
+
+  -webkit-box-sizing: border-box; /* For legacy WebKit based browsers */
+     -moz-box-sizing: border-box; /* For legacy (Firefox <29) Gecko based browsers */
+          box-sizing: border-box;
+}
+
+@media (max-width: 745px) {
+
+  .upload-img-prev {
+    width: 100%;
+    max-height:
+  }
+
+  input, textarea, select, button {
+    width : 100%;
+    margin: 0;
+
+    -webkit-box-sizing: border-box; /* For legacy WebKit based browsers */
+       -moz-box-sizing: border-box; /* For legacy (Firefox <29) Gecko based browsers */
+            box-sizing: border-box;
+  }
+}

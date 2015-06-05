@@ -1,0 +1,44 @@
+#map-container {
+  width: 100vw;
+  height: 66vh;
+}
+
+#map-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+#places-input {
+  background-color: #fff;
+  font-family: Roboto;
+  font-size: 18px;
+  font-weight: 300; /*not sure what this does?*/
+  margin-left: 18px;
+  padding: 0 12px 0 12px; /*top right bottom left*/
+  text-overflow: ellipsis; /*not sure what this is doing either?*/
+  width: 30%;
+  min-width: 500px;
+}
+
+.controls {
+  margin-top: 18px;
+  border: 1px solid transparent;
+  border-radius: 3px 0 0 3px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  height: 30px;
+  outline: none;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 745px) {
+  #places-input {
+    width: calc(100% - 175px);
+    min-width: 200px;
+  }
+
+  #map-container {
+    height: 50vh;
+  }
+
+}

@@ -3,7 +3,8 @@
 
 	<head profile="http://www.w3.org/2005/10/profile">
 		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no">
+		<meta name="viewport"
+			  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 		<title>{% block title %}{% endblock %}</title>
 
 		<link rel="icon"
@@ -38,7 +39,7 @@
     <body class="background-color-0">
         {% block nav_header %}
         <div id="header-container" class="color-6">
-            <div class="margin-left-5 delayed-fade-in">
+            <div id="page-title" class="margin-left-5 delayed-fade-in">
                 #europe2015
             </div>
         </div>
@@ -48,8 +49,10 @@
 			<div class="delayed-fade-in color-6">
 				<div class="menu phone nav-item background-color-2">menu</div>
 				<!-- navigation bar goes here-->
-				<div href="{{ url_for('map_posts') }}" class="nav-item background-color-2">map</div>
-				<div href="{{ url_for('upload') }}" class="nav-item background-color-2">upload
+				<div href="{{ url_for('map_posts') }}"
+					 class="nav-item background-color-2 border-color-6">map</div>
+				<div href="{{ url_for('upload') }}"
+					 class="nav-item background-color-2 border-color-6">upload
 				</div>
 			</div>
 			<div class="phone slide-in-from-right hline background-color-1a"></div>

@@ -5,12 +5,23 @@
         <script type="text/javascript"
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7oYhGu2nYJUFZOEVh1Z7qdpjlriSzdEc&libraries=places">
         </script>
+
+		<link rel='stylesheet' type='text/css'
+			href="{{ url_for('static', filename='css/map_posts.css') }}">
     {% endblock %}
 
 	{% block content %}
 		<div id="map-container">
 			<input id="places-input" class="controls" type="text" placeholder="Search here">
 			<div id="map-canvas"></div>
+		</div>
+
+		<div id="post-card-container">
+			<!--{% for post in context.posts %}-->
+				<!--<div>-->
+					<!--{{ post }}-->
+				<!--</div>-->
+			<!--{% endfor %}-->
 		</div>
 	{% endblock %}
 

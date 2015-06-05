@@ -2,39 +2,53 @@
 	{% block title %}Make a post{% endblock %}
 
     {% block head_scripts %}
+        <link rel='stylesheet' type='text/css'
+            href="{{ url_for('static', filename='css/upload.css') }}">
     {% endblock %}
 
 	{% block content %}
-        <div>
-            Choose your photos to upload
-        </div>
-        <!--<div class="slide-in-from-right hline background-color-1a margin-left-5"></div>-->
+    <div class="upload-page color-6 delayed-fade-in">
 
         <form onSubmit="event.preventDefault()"
               id="upload-photo" name="uploadForm">
-            <label>
-                User
-            </label>
-            <select id="user-details">
-                    <option value="">Choose a user...</option>
-                {% for user in context.users %}
-                    <option value="{{ user.user_id }}">{{ user.name }}</option>
-                {% endfor %}
-            </select><br/>
-            <input type="file" name="image" id="file-field"><br/>
-            <textarea name="status" id ="status-text" form="upload-photo"
-                      placeholder="Add a status post here..."></textarea>
 
-            <div id="geolocation">
-                <button type="button" id="geolocation-button">Get geolocation</button>
+            <div id="user-entry" class="form-element">
+                <label>
+                    User
+                </label>
+                <select id="user-details">
+                        <option value="">Choose a user...</option>
+                    {% for user in context.users %}
+                        <option value="{{ user.user_id }}">{{ user.name }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <input type="submit" name="submit" id="upload-button" value="Submit">
+
+            <div id="photo-entry" class="form-element">
+                <label>
+                    Photo
+                </label>
+                <input type="file" name="image" id="file-field">
+            </div>
+
+            <div id="post-entry" class="form-element">
+                <label>
+                    Post
+                </label>
+                <textarea name="status" id ="status-text" form="upload-photo"
+                          placeholder="Add a status post here..."></textarea>
+            </div>
+
+            <div id="form-submit" class="form-element">
+                <input type="submit" name="submit" id="upload-button" value="Submit">
+            </div>
         </form>
 
 
         <div id="img-preview">
 
         </div>
+    </div>
 	{% endblock %}
 
     {% block tail_scripts %}

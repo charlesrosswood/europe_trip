@@ -3,6 +3,7 @@ __author__ = 'cwod'
 from flask import render_template
 import py_modules.users as users
 import simplejson as json
+from operator import itemgetter
 
 
 def decode_request(request_obj):
@@ -28,12 +29,19 @@ class TemplateRenderers(object):
     """
 
     @staticmethod
-    def map_posts(*args, **kwargs):
-        return render_template('map_posts.html'), 200
+    def map_posts(db):
+        user_uploads = users.User.get_all_users_uploads(db)
+        all_posts = []
+        for user in user_uploads:
+            all_posts.extend(user['posts'])
+        all_posts = sorted(all_posts, key=itemgetter('post_timestamp'), reverse=True)
+
+        return render_template('map_posts.html', context={'posts': all_posts}), 200
 
     @staticmethod
     def upload(db):
         all_users = users.User.get_all_users_from_db(db)
+
         return render_template('upload.html', context={'users': all_users}), 200
 
 

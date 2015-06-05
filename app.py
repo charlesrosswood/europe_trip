@@ -35,7 +35,7 @@ app = Flask(__name__)
 # Views that render templates
 @app.route('/', methods=['GET'])
 def map_posts(*args, **kwargs):
-    return views.TemplateRenderers.map_posts(*args, **kwargs)
+    return views.TemplateRenderers.map_posts(db)
 
 @app.route('/upload', methods=['GET'])#, 'POST'])
 def upload(*args, **kwargs):
