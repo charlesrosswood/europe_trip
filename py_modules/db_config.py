@@ -48,8 +48,17 @@ class DatabaseConfig(object):
                                                                                        port)
 
         self.config = connection_string  # is this unnecessary?
+        self.connection = None
+        self.connectDb()
 
-        self.connection = dbdriver.connect(self.config)
+    def connectDb(self):
+        if self.connection:
+            if self.connection.closed != 0:
+                self.connection.close()
+                self.connection = dbdriver.connect(self.config)
+        else:
+            self.connection = dbdriver.connect(self.config)
+
 
     def select_from_table(self, tablename, columns=None, schema=None, where=None):
         """
@@ -77,24 +86,29 @@ class DatabaseConfig(object):
         print(select_statement)
         cleaned_records = []
         with self.connection.cursor() as db_cursor:
-            db_cursor.execute(select_statement)
+            try:
+                db_cursor.execute(select_statement)
+                # fetch the column names to make a dictionary/hash map object
+                column_names = [desc[0] for desc in db_cursor.description]
 
-            # fetch the column names to make a dictionary/hash map object
-            column_names = [desc[0] for desc in db_cursor.description]
+                records = db_cursor.fetchall()
 
-            records = db_cursor.fetchall()
+                # this will be slow
+                for record in records:
+                    record_dict = {}
+                    for i in range(len(column_names)):
+                        record_dict[column_names[i]] = record[i]
+                    cleaned_records.append(record_dict)
 
-            # this will be slow
-            for record in records:
-                record_dict = {}
-                for i in range(len(column_names)):
-                    record_dict[column_names[i]] = record[i]
-                cleaned_records.append(record_dict)
+                db_cursor.close()
 
-            db_cursor.close()
-
-        response = ReturnStatus(return_value=cleaned_records, status_code=200,
-            message='statement: "%s"' % (select_statement,))
+                response = ReturnStatus(return_value=cleaned_records, status_code=200,
+                    message='statement: "%s"' % (select_statement,))
+            except (psycopg2.InternalError, psycopg2.ProgrammingError) as e:
+                self.connection.rollback()
+                response = ReturnStatus(return_value=None, status_code=500,
+                    message='We failed to execute the statement: "%s"' % (select_statement,),
+                    error_message=e.pgerror)
 
         return response.get_dict()
 
@@ -122,7 +136,10 @@ class DatabaseConfig(object):
 
         with self.connection.cursor(
             'cursor_unique_name', cursor_factory=psycopg2.extras.DictCursor) as db_cursor:
-            db_cursor.execute(select_statement)
+            try:
+                db_cursor.execute(select_statement)
+            except (psycopg2.InternalError, psycopg2.ProgrammingError):
+                self.connection.rollback()
 
             return db_cursor  # note this is now an iterable
 
@@ -153,22 +170,60 @@ class DatabaseConfig(object):
             SQL_statement = insert_string + values_string.replace('ARRAY[', '(').replace(']',')')
 
             #  adding returning the table id
-            tablename_id = tablename+'_id'
-            SQL_statement += ' RETURNING %s' % (tablename_id,)
+            SQL_statement += ' RETURNING id'
             try:
                 cursor.execute(SQL_statement)
                 # cursor.executemany(SQL_statement % (values))
                 row_id = cursor.fetchone()[0]
 
                 return_dict = [{
-                    tablename_id: row_id
+                    'id': row_id
                 }]
                 self.connection.commit()
                 response = ReturnStatus(return_value=return_dict, status_code=201,
                     message='statement: ''"%s"' % (SQL_statement, ))
-            except psycopg2.Error as e:
+            except (psycopg2.InternalError, psycopg2.ProgrammingError) as e:
                 self.connection.rollback()
                 response = ReturnStatus(return_value=None, status_code=500,
                     message='statement: "%s"' % (SQL_statement, ), error_message=e.pgerror)
+
+        return response.get_dict()
+
+    def update_table(self, tablename, set_clauses, where_clauses=None, schema=None):
+        """
+        set_clauses should be a list of "<db_param>=<new_value>"
+        :param tablename:
+        :param set_clauses:
+        :param where_clause:
+        :param schema:
+        :return:
+        """
+        if schema is None:
+            update_string = 'UPDATE %s ' % (tablename,)
+        else:
+            update_string = 'UPDATE %s.%s ' % (schema, tablename)
+
+        update_string += 'SET %s' % (','.join(set_clauses))
+
+        if where_clauses:
+            update_string += ' WHERE %s' % (','.join(where_clauses))
+
+        update_string += ' RETURNING id'
+
+        with self.connection.cursor() as cursor:
+            try:
+                cursor.execute(update_string)
+                row_ids = cursor.fetchall()
+                return_dict = [{
+                    'ids': [id[0] for id in row_ids]
+                }]
+
+                self.connection.commit()
+                response = ReturnStatus(return_value=return_dict, status_code=200,
+                    message='statement: ''"%s"' % (update_string, ))
+            except (psycopg2.InternalError, psycopg2.ProgrammingError) as e:
+                self.connection.rollback()
+                response = ReturnStatus(return_value=None, status_code=500,
+                    message='statement: "%s"' % (update_string, ), error_message=e.pgerror)
 
         return response.get_dict()

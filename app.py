@@ -1,6 +1,7 @@
 __author__ = 'cwod'
 
 from flask import Flask
+from flask import request
 import py_modules.db_config as database
 import platform
 import os
@@ -36,21 +37,9 @@ app = Flask(__name__)
 def map_posts(*args, **kwargs):
     return views.TemplateRenderers.map_posts(*args, **kwargs)
 
-# @app.route('/index', methods=['GET'])
-# def index(*args, **kwargs):
-#     return views.TemplateRenderers.index(*args, **kwargs)
-
 @app.route('/upload', methods=['GET'])#, 'POST'])
 def upload(*args, **kwargs):
     return views.TemplateRenderers.upload(db)
-
-# @app.route('/view-uploads', methods=['GET'])
-# def view_uploads(*args, **kwargs):
-#     return views.TemplateRenderers.view_uploads(db)
-
-# @app.route('/map', methods=['GET'])
-# def map(*args, **kwargs):
-#     return views.TemplateRenderers.map(*args, **kwargs)
 
 
 # RESTful views that act as APIs
@@ -61,17 +50,27 @@ def update_posts():
 # RESTful database methods
 # TODO: Fix for SQL injection
 @app.route('/read/<tablename>', methods=['GET'])
-@app.route('/read/<tablename>/<id>', methods=['GET'])
-def read(tablename, id=None):
-    return views.RestfulApis.read(db, tablename, id)
+def read(tablename):
+    """
+    pass id and columns in as a query parameter
+    :param tablename:
+    :return:
+    """
+    id = request.args.get('id', None)
+    columns = request.args.get('columns', '').split(',')
+    if len(columns) == 1 and not columns[0]:
+        columns = None
+    print(columns, type(columns))
+    return views.RestfulApis.read(db, tablename, columns, id)
 
-@app.route('/write/<tablename>', methods=['POST'])
+
+@app.route('/write/<schema>/<tablename>', methods=['POST'])
 def write(tablename):
-    return views.RestfulApis.write(db, tablename)
+    return views.RestfulApis.write(request, db, tablename)
 
-@app.route('/save-route', methods=['GET'])
-def save_route():
-    return views.RestfulApis.save_route(db)
+@app.route('/update/<tablename>', methods=['PUT'])
+def update(tablename):
+    return views.RestfulApis.update(request, db, tablename)
 
 
 # Handling HTTP errors
@@ -101,5 +100,4 @@ def server_error(e):
 
 # if the app is run directly from command line, hit this function
 if __name__ == '__main__':
-    app.secret_key = 'qwertyuiop'
     app.run(debug=_DEBUG_)

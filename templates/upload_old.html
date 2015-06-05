@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+	<head profile="http://www.w3.org/2005/10/profile">
+		<meta charset="UTF-8">
+		<!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+		<title>Upload images</title>
+
+		<link rel="icon"
+			  type="image/png"
+			  sizes="96x96"
+			  href="{{ url_for('static', filename='images/favicons/favicon-96x96.png') }}">
+
+		<link rel='stylesheet' type='text/css'
+			  href="{{ url_for('static', filename='css/layout.css') }}">
+
+		<link rel='stylesheet' type='text/css'
+			  href="{{ url_for('static', filename='css/colours.css') }}">
+
+		<link rel='stylesheet' type='text/css'
+			  href="{{ url_for('static', filename='css/transitions.css') }}">
+
+		<link rel='stylesheet'
+			  type='text/css'
+			  href='http://fonts.googleapis.com/css?family=Anton'>
+
+		<link  rel='stylesheet'
+			   type='text/css'
+			   href='http://fonts.googleapis.com/css?family=Lato:400,700'>
+
+		<script type="text/javascript"
+				src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7oYhGu2nYJUFZOEVh1Z7qdpjlriSzdEc&libraries=places,drawing">
+		</script>
+
+
+	</head>
+
+    <body class="background-color-0">
+
+		<div id="header-container" class="color-6">
+			<div class="header margin-left-5 delayed-fade-in">
+				#europe2015
+			</div>
+			<div class="slide-in-from-right hline background-color-1a margin-left-5"></div>
+		</div>
+
+        <div class="margin-top-10-percent color-6 margin-left-5 delayed-fade-in body-font">
+            <div>
+                Choose your photos to upload
+            </div>
+            <!--<div class="slide-in-from-right hline background-color-1a margin-left-5"></div>-->
+
+			<form onSubmit="event.preventDefault()"
+				  id="upload-photo" name="uploadForm">
+				<label>
+					User
+				</label>
+				<select id="user-details">
+						<option value="">Choose a user...</option>
+					{% for user in context.users %}
+						<option value="{{ user.user_id }}">{{ user.name }}</option>
+					{% endfor %}
+				</select><br/>
+				<input type="file" name="image" id="file-field"><br/>
+				<textarea name="status" id ="status-text" form="upload-photo"
+						  placeholder="Add a status post here..."></textarea>
+
+				<div id="geolocation">
+					<button type="button" id="geolocation-button">Get geolocation</button>
+				</div>
+				<input type="submit" name="submit" id="upload-button" value="Submit">
+			</form>
+
+
+			<div id="img-preview">
+
+			</div>
+        </div>
+
+    </body>
+	<script type="text/javascript"
+		src="{{ url_for('static', filename='js/upload_view/upload_view_bundle.js') }}"></script>
+
+</html>
