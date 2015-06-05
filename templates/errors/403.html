@@ -1,41 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head lang="en" profile="http://www.w3.org/2005/10/profile">
-        <meta charset="UTF-8">
-		<!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-		<title>Forbidden</title>
+{% extends "errors/_base_error.html" %}
 
-		<link rel="icon"
-			type="image/png"
-			sizes="96x96"
-			href="{{ url_for('static', filename='images/favicons/favicon-96x96.png') }}">
+{% block title %}
+	Forbidden
+{% endblock %}
 
-		<link rel='stylesheet' type='text/css'
-			  href="{{ url_for('static', filename='css/layout.css') }}">
+{% block error_heading %}
+	We had a 403 error :-(
+{% endblock %}
 
-		<link rel='stylesheet' type='text/css'
-			  href="{{ url_for('static', filename='css/colours.css') }}">
-
-    		<link rel='stylesheet' type='text/css'
-			  href="{{ url_for('static', filename='css/transitions.css') }}">
-
-		<link rel='stylesheet'
-			  type='text/css'
-			  href='http://fonts.googleapis.com/css?family=Anton'>
-
-</head>
-<body class="background-color-0">
-    <div id="header-container" class="vert-center color-6">
-        <div class="margin-left-5 delayed-fade-in">
-            We had a 403 error :-(
-        </div>
-        <div class="slide-in-from-right hline background-color-1a margin-left-5"></div>
-
-        <p class="delayed-fade-in margin-left-5">
-            Unfortunately you're forbidden from accessing this resource, we'll resolve to fix it
-			quickly!
-        </p>
-    </div>
-
-</body>
-</html>
+{% block error_content %}
+	Unfortunately you're forbidden from accessing this resource, we'll resolve to fix it quickly!
+{% endblock %}

@@ -1,8 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
-//var searchBoxListener = require('./_places_changed_listener').searchBoxListener;
-//var markerListener = require('./_marker_listener').markerListener;
 
 var chosenPlaces = [];  // TODO: pointless?
 var lookup = [];
@@ -48,7 +46,6 @@ function initialiseGMaps(userPosts) {
     // for every post by that user
     for (var j = 0; j < posts.length; j++) {
       var post = posts[j];
-      console.log(post);
       var marker = new google.maps.Marker({
         position: new google.maps.LatLng(post.latitude, post.longitude),
         map: map,
@@ -57,33 +54,13 @@ function initialiseGMaps(userPosts) {
     }
 
   }
-  // [START region_getplaces]
-  // Listen for the event fired when the user selects an item from the
-  // pick list. Retrieve the matching places for that item
-//  searchBoxListener(searchBox, chosenPlaces, lookup, map, markers);
 
-//  markerListener(markers, drawingManager, lookup);
 
 }
 
 google.maps.event.addDomListener(window, 'load', getNewUserPosts);
 
-//function saveRoute() {
-//  var url = endPoints.saveRoute.url;
-//  console.log(endPoints.readTable('testing').url);
-//
-//  var aClient = new HttpClient();
-//  aClient.post(url, chosenPlaces, function(response) {
-//    var object = JSON.parse(response);
-//    console.log(object);
-//  });
-//
-//}
-
-
 //// Add all listeners down here
-//var save_route_button = document.getElementById('save-route-button');
-//save_route_button.addEventListener("click", saveRoute);
 
 },{"../common_modules/_allowed_urls":2,"../common_modules/_http_client":3}],2:[function(require,module,exports){
 var endPoints = (function() {

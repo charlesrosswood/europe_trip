@@ -1,14 +1,11 @@
 __author__ = 'cwod'
 
 from flask import Flask
-from flask import render_template
 import py_modules.db_config as database
-import simplejson as json
-from flask import request
-from flask import abort
 import platform
 import os
-import py_modules.users as users
+import py_modules.views as views
+import py_modules.error_views as error_views
 
 if platform.system() in ['Windows', 'Darwin']:  # local dev server
     _HOST_ = 'localhost'
@@ -33,162 +30,74 @@ db = database.DatabaseConfig(host=_HOST_, dbname=_DBNAME_, user=_USER_,
 
 app = Flask(__name__)
 
-def decode_request(request_obj):
-    con_type = request_obj.content_type
-    charset = 'charset='
-
-    start_index = con_type.lower().find(charset)
-    end_index = con_type.lower().find(';', start_index + len(charset))
-    if end_index == -1:
-        end_index = len(con_type)
-
-    if start_index > -1:  # found a charset
-        required_codec = con_type[start_index + len(charset):end_index]
-    else:  # default utf-8
-        required_codec = 'utf-8'
-
-    return request.data.decode(required_codec)
 
 # Views that render templates
 @app.route('/', methods=['GET'])
-def map_posts():
-    return render_template('map_posts.html'), 200
+def map_posts(*args, **kwargs):
+    return views.TemplateRenderers.map_posts(*args, **kwargs)
 
-@app.route('/index', methods=['GET'])
-def index():
-    return render_template('index.html'), 200
+# @app.route('/index', methods=['GET'])
+# def index(*args, **kwargs):
+#     return views.TemplateRenderers.index(*args, **kwargs)
 
 @app.route('/upload', methods=['GET'])#, 'POST'])
-def upload():
-    all_users = users.User.get_all_users_from_db(db)
-    return render_template('upload.html', context={'users': all_users}), 200
+def upload(*args, **kwargs):
+    return views.TemplateRenderers.upload(db)
 
-@app.route('/view-uploads', methods=['GET'])
-def view_uploads():
-    user_uploads = users.User.get_all_users_uploads(db)
+# @app.route('/view-uploads', methods=['GET'])
+# def view_uploads(*args, **kwargs):
+#     return views.TemplateRenderers.view_uploads(db)
 
-    def find_photo(users_uploads):
-        for user in users_uploads:
-            if user['photo_uploads']:
-                for photo in user['photo_uploads']:
-                    return photo['image_url']
-            else:
-                return None
-    init_photo = find_photo(user_uploads)
+# @app.route('/map', methods=['GET'])
+# def map(*args, **kwargs):
+#     return views.TemplateRenderers.map(*args, **kwargs)
 
-    context = {
-        'users': user_uploads,
-        'init_photo': init_photo
-    }
-    return render_template('view_uploads.html', context=context)
-
-@app.route('/map', methods=['GET'])
-def map():
-    return render_template('map.html'), 200
 
 # RESTful views that act as APIs
 @app.route('/get-updated-posts', methods=['GET'])
 def update_posts():
-    user_uploads = users.User.get_all_users_uploads(db)
-    context = {
-        'users': user_uploads
-    }
-
-    print(user_uploads)
-    return json.dumps(context), 200
-
+    return views.RestfulApis.update_posts(db)
 
 # RESTful database methods
 # TODO: Fix for SQL injection
 @app.route('/read/<tablename>', methods=['GET'])
 @app.route('/read/<tablename>/<id>', methods=['GET'])
 def read(tablename, id=None):
-    if id is None or str(id).lower() == 'null':
-        db_response = db.select_from_table(tablename=tablename)
-        return json.dumps(db_response), db_response['status']
-    else:
-        where_string = 'WHERE id=%s' % (id,)
-        try:
-            db_response = db.select_from_table(tablename=tablename, where=where_string)
-            return json.dumps(db_response), db_response['status']
-
-        except:  # TODO: catch all exception - bad
-            abort(404)
-
+    return views.RestfulApis.read(db, tablename, id)
 
 @app.route('/write/<tablename>', methods=['POST'])
 def write(tablename):
-    """
-    The POST request should be sent to: http://<address of server>/write/<table name to write to>
-    The POST request should have a payload body like this:
-
-    {
-        'columns': <list> of strings of column names to write -- OPTIONAL,
-        'values': <list of <list>> of values to write (e.g. [[1,'foo',3],[2,'bar',4]]-- REQUIRED
-    }
-
-    :return:
-
-    """
-    # TODO: make sure we return the id of the inserted row
-
-    payload = json.loads(decode_request(request))
-    print(payload)
-    try:
-        if 'columns' in payload.keys():
-            columns = payload['columns']
-        else:
-            columns = None
-        values = payload['values']
-
-        insert_success = db.insert_into_table(
-            tablename=tablename,
-            values=values,
-            columns=columns
-        )
-        print(insert_success)
-        return json.dumps(insert_success), insert_success['status']
-
-    except:  # TODO: catch all exception!
-        abort(500)
+    return views.RestfulApis.write(db, tablename)
 
 @app.route('/save-route', methods=['GET'])
 def save_route():
-    # request_data = json.loads(decode_request(request))
-    # print(request_data)
-
-    from datetime import datetime
-    now = datetime.now()
-    print(now)
-    db.insert_into_table('geolocations', [[now]], ['entry_timestamp'],)
-    return json.dumps(True), 201
+    return views.RestfulApis.save_route(db)
 
 
 # Handling HTTP errors
 @app.errorhandler(400)
 def forbidden(e):
-    return render_template('errors/400.html'), 400
+    return error_views.ErrorRenderers.forbidden(e)
 
 @app.errorhandler(403)
 def bad_request(e):
-    return render_template('errors/403.html'), 403
+    return error_views.ErrorRenderers.bad_request(e)
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('errors/404.html'), 404
+    return error_views.ErrorRenderers.page_not_found(e)
 
 @app.errorhandler(405)
 def method_not_allowed(e):
-    print('error', e)
-    return render_template('errors/405.html'), 405
+    return error_views.ErrorRenderers.method_not_allowed(e)
 
 @app.errorhandler(410)
 def gone(e):
-    return render_template('errors/410.html'), 410
+    return error_views.ErrorRenderers.gone(e)
 
 @app.errorhandler(500)
 def server_error(e):
-    return render_template('errors/500.html'), 500
+    return error_views.ErrorRenderers.server_error(e)
 
 # if the app is run directly from command line, hit this function
 if __name__ == '__main__':
