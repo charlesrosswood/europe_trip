@@ -1,10 +1,11 @@
 var uploadToImgur = require('./_imgur_upload').uploadToImgur;
-var statusUpload = require('./_status_upload').statusUpload;
 var createImgPreview = require('./_imgur_upload').createImgPreview;
-var geolocationUpload= require('./_geolocation_upload').geolocationUpload;
+var HttpClient = require('../common_modules/_http_client').HttpClient;
+var endPoints = require('../common_modules/_allowed_urls').endPoints;
 
 // Add all listeners down here
 var uploadPost = document.getElementById('upload-photo');
+var form = document.getElementById('file-field');
 
 // getting current timestamp with timezone
 
@@ -20,78 +21,109 @@ uploadPost.addEventListener("submit", function() {
 
   var statusDiv = document.getElementById('status-text');
   var statusText = statusDiv.value;
-
-  // TODO: 1. make post with status text and user, 2. update if position, 3. update if imgurURL
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-
-      lat = position.coords.latitude;
-      lng = position.coords.longitude;
-
-
-  //    var placeNameNode = document.createElement('input');
-  //    placeNameNode.setAttribute('placeholder', 'Placename...');
-  //    placeNameNode.setAttribute('id', 'placename-input');
-  //    geolocationDiv.appendChild(placeNameNode);
-  //
-  //    para.innerHTML = 'Latitude: ' + lat + '<br/>Longtiude: ' + lng;
-  //    geolocationDiv.appendChild(para);
-  //
-  //    geolocationDiv.setAttribute('data-longitude', lng);
-  //    geolocationDiv.setAttribute('data-latitude', lat);
-    });
+  if (statusText == '') {
+    statusText = null;
   }
 
+  /*
+  (A) -- making the initial post --
+  */
+  var aBodyData = {
+    columns: ['user_id', 'post_timestamp', 'status_entry'],
+    values: [[userId, timeNowMs, statusText]]
+  };
 
+  var aClient = new HttpClient();
 
-  var form3 = document.getElementById('file-field');
-  var files = form3.files;
+  aClient.post(endPoints.writeTable('posts').url, aBodyData, function(aResponse, aStatus) {
+    if (aStatus == 201) {
+      console.log('created post!');
+      response = JSON.parse(aResponse);
+      var postId = response.result[0].id;
 
-  for (var i = 0; i < files.length; i++) {
-    var file = files[i];
+      /*
+      (B) -- updating with location --
+      */
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          lat = position.coords.latitude;
+          lng = position.coords.longitude;
+          var bBodyData = {
+            'set_clauses': [
+              'latitude='.concat(lat),
+              'longitude='.concat(lng)
+            ],
+            'where_clauses': ['id='.concat(postId)]
+          };
 
-    var aClient = new HttpClient();
+          console.log(bBodyData);
 
-    aClient.postImgur(file, function(response) {
-      var imgurResponse = JSON.parse(response);
-      var imgurUrl = imgurResponse.data.link;
-      var imgurDeleteHash = imgurResponse.data.deletehash;
-    });
-  }
+          var bClient = new HttpClient();
 
-
-
-
-
-
-
-
-  geolocationUpload(ownerId, timeNowMs, function(response, status) {
-
-    var geolocationId = null;
-    if (status == 201) {
-      var response = JSON.parse(response);
-      geolocationId = response.result[0].geolocations_id;
-    }
-
-    statusUpload(ownerId, geolocationId, timeNowMs,  function(response, status) {
-
-      var statusId = null;
-      if (status == 201) {
-        var response = JSON.parse(response);
-        var statusId = response.result[0].status_entries_id
+          bClient.put(endPoints.updateTable('posts').url, bBodyData, function(bResponse, bStatus) {
+            if (bStatus == 200) {
+              console.log('added location!');
+            } else {
+              console.log('failed to add location to post');
+              console.log(bResponse, bStatus);
+            }
+          });
+        });
+      } else {
+        console.log('device does not have geolocation');
       }
 
-      uploadToImgur(ownerId, statusId, geolocationId, timeNowMs);
-    });
+      /*
+      (C) -- updating with pictures --
+      */
+      if (form.files) {
+        for (var i = 0; i < form.files.length; i++) {
+          var file = form.files[i];
 
+          var cClient = new HttpClient();
+
+          cClient.postImgur(file, function(cResponse, cStatus) {
+            if (cStatus == 200) {
+              var imgurResponse = JSON.parse(cResponse);
+              var imgurUrl = imgurResponse.data.link;
+              var imgurDeleteHash = imgurResponse.data.deletehash;
+
+              var dBodyData = {
+                'set_clauses': [
+                  "image_url='".concat(imgurUrl, "'"),
+                  "image_deletehash='".concat(imgurDeleteHash, "'")
+                ],
+                'where_clauses': ['id='.concat(postId)]
+              };
+
+              var dClient = new HttpClient();
+
+              dClient.put(endPoints.updateTable('posts').url, dBodyData, function(dResponse,
+              dStatus) {
+                if (dStatus == 200) {
+                  console.log('we uploaded and updated images!');
+                } else {
+                  console.log('failed to add imgur URL to post');
+                  console.log(dResponse, dStatus);
+                }
+              });
+            } else {
+              console.log('failed to upload to Imgur');
+              console.log(cResponse, cStatus);
+            }
+          });
+
+        }
+
+      }
+
+    } else {
+      console.log('failed to make post');
+      console.log(aResponse, aStatus);
+    }
   });
+
 });
-
-
-
-
-
 
 
 var chooseImage = document.getElementById('file-field');
@@ -102,39 +134,5 @@ chooseImage.addEventListener("change", function() {
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
     createImgPreview(file);
-  }
-});
-
-
-
-
-// TODO: is this necessary?
-var geolocationButton = document.getElementById('geolocation-button');
-geolocationButton.addEventListener('click', function() {
-
-  var geolocationDiv = document.getElementById('geolocation');
-
-  var para = document.createElement('p');
-
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-
-      var placeNameNode = document.createElement('input');
-      placeNameNode.setAttribute('placeholder', 'Placename...');
-      placeNameNode.setAttribute('id', 'placename-input');
-      geolocationDiv.appendChild(placeNameNode);
-
-      var lat = position.coords.latitude;
-      var lng = position.coords.longitude;
-      para.innerHTML = 'Latitude: ' + lat + '<br/>Longtiude: ' + lng;
-      geolocationDiv.appendChild(para);
-
-      geolocationDiv.setAttribute('data-longitude', lng);
-      geolocationDiv.setAttribute('data-latitude', lat);
-    });
-  } else {
-    var node = document.createTextNode('Location not available');
-    para.appendChild(node);
-    geolocationDiv.appendChild(paraNode);
   }
 });

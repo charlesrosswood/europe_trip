@@ -20,12 +20,16 @@ class User(object):
             users_profiles_where_string = ["user_id='%s'" % (users_details['id'],)]
             user_profile_results = db.select_from_table('user_profiles',
                 where=users_profiles_where_string)
-            profile_details = user_profile_results['result'][0]
-            print(profile_details)
+            if user_profile_results['result']:
+                profile_details = user_profile_results['result'][0]
+                print(profile_details)
+                self.first_name = profile_details['first_name']
+                self.first_name = profile_details['last_name']
+            else:
+                self.first_name = ''
+                self.last_name = ''
             self.user_id = users_details['id']
             self.email = users_details['email']
-            self.first_name = profile_details['first_name']
-            self.first_name = profile_details['last_name']
 
             return self
 

@@ -66,25 +66,25 @@ google.maps.event.addDomListener(window, 'load', getNewUserPosts);
 var endPoints = (function() {
   return {
 
-    saveRoute: {
-      url: 'save-route',
-      methods: ['POST']
-    },
+//    saveRoute: {
+//      url: 'save-route',
+//      methods: ['POST']
+//    },
 
     getUpdatedPosts: {
       url: 'get-updated-posts',
       methods: ['GET']
     },
 
-    upload: {
-      url: 'upload',
-      methods: ['GET', 'POST']
-    },
+//    upload: {
+//      url: 'upload',
+//      methods: ['GET', 'POST']
+//    },
 
-    map: {
-      url: 'map',
-      methods: ['GET']
-    },
+//    map: {
+//      url: 'map',
+//      methods: ['GET']
+//    },
 
     readTable: function(tablename, id) {
       return {
@@ -97,6 +97,13 @@ var endPoints = (function() {
       return {
         url: 'write/' + tablename,
         methods: ['POST']
+      };
+    },
+
+    updateTable: function(tablename) {
+      return {
+        url: 'update/' + tablename,
+        methods: ['PUT']
       };
     },
 
@@ -144,6 +151,21 @@ var HttpClient = function() {
     }
 
     anHttpRequest.open( "POST", aUrl, true );
+
+    anHttpRequest.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+
+    anHttpRequest.send(JSON.stringify(bodyData));
+  };
+
+  this.put = function(aUrl, bodyData, aCallback) {
+    var anHttpRequest = new XMLHttpRequest();
+    anHttpRequest.onreadystatechange = function() {
+      if (anHttpRequest.readyState == 4) {
+        aCallback(anHttpRequest.responseText, anHttpRequest.status);
+      }
+    }
+
+    anHttpRequest.open( "PUT", aUrl, true );
 
     anHttpRequest.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 

@@ -41,6 +41,21 @@ var HttpClient = function() {
     anHttpRequest.send(JSON.stringify(bodyData));
   };
 
+  this.put = function(aUrl, bodyData, aCallback) {
+    var anHttpRequest = new XMLHttpRequest();
+    anHttpRequest.onreadystatechange = function() {
+      if (anHttpRequest.readyState == 4) {
+        aCallback(anHttpRequest.responseText, anHttpRequest.status);
+      }
+    }
+
+    anHttpRequest.open( "PUT", aUrl, true );
+
+    anHttpRequest.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+
+    anHttpRequest.send(JSON.stringify(bodyData));
+  };
+
   this.postImgur = function(imgFile, aCallback) {
 
     var aUrl = 'https://api.imgur.com/3/image';

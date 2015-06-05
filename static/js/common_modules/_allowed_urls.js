@@ -1,25 +1,25 @@
 var endPoints = (function() {
   return {
 
-    saveRoute: {
-      url: 'save-route',
-      methods: ['POST']
-    },
+//    saveRoute: {
+//      url: 'save-route',
+//      methods: ['POST']
+//    },
 
     getUpdatedPosts: {
       url: 'get-updated-posts',
       methods: ['GET']
     },
 
-    upload: {
-      url: 'upload',
-      methods: ['GET', 'POST']
-    },
+//    upload: {
+//      url: 'upload',
+//      methods: ['GET', 'POST']
+//    },
 
-    map: {
-      url: 'map',
-      methods: ['GET']
-    },
+//    map: {
+//      url: 'map',
+//      methods: ['GET']
+//    },
 
     readTable: function(tablename, id) {
       return {
@@ -32,6 +32,13 @@ var endPoints = (function() {
       return {
         url: 'write/' + tablename,
         methods: ['POST']
+      };
+    },
+
+    updateTable: function(tablename) {
+      return {
+        url: 'update/' + tablename,
+        methods: ['PUT']
       };
     },
 

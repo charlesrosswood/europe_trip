@@ -102,7 +102,6 @@ class RestfulApis(object):
         {
             'set_clauses': <list> of strings of the format: <column name>=<new value>,
             'where_clauses': <list> of strings of the format: <column name>=<new value>,
-
         }
         :param request:
         :param db:

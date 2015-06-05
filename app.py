@@ -64,7 +64,7 @@ def read(tablename):
     return views.RestfulApis.read(db, tablename, columns, id)
 
 
-@app.route('/write/<schema>/<tablename>', methods=['POST'])
+@app.route('/write/<tablename>', methods=['POST'])
 def write(tablename):
     return views.RestfulApis.write(request, db, tablename)
 
