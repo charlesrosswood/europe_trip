@@ -3,6 +3,9 @@ var uploadToImgur = require('./_imgur_upload').uploadToImgur;
 var createImgPreview = require('./_imgur_upload').createImgPreview;
 var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
+var showLoading = require('../common_modules/_loading').showLoading;
+var doneLoading = require('../common_modules/_loading').doneLoading;
+var checkLoaded = require('../common_modules/_loading').checkLoaded;
 
 // Add all listeners down here
 var uploadPost = document.getElementById('upload-photo');
@@ -15,6 +18,8 @@ var timeNowMs = timeNow.getTime()
 
 uploadPost.addEventListener("submit", function() {
 
+  showLoading();
+
   var lat = null;
   var lng = null;
 
@@ -26,18 +31,25 @@ uploadPost.addEventListener("submit", function() {
     statusText = null;
   }
 
+  var postSuccess = false;
+  var locationSuccess = false;
+  var imgurSuccess = false;
+  var imageSuccess = false;
+
   /*
   (A) -- making the initial post --
   */
   var aBodyData = {
     columns: ['user_id', 'post_timestamp', 'status_entry'],
-    values: [[userId, timeNowMs, statusText]]
+    values: [[parseInt(userId), timeNowMs, statusText]]
   };
 
   var aClient = new HttpClient();
 
   aClient.post(endPoints.writeTable('posts').url, aBodyData, function(aResponse, aStatus) {
     if (aStatus == 201) {
+      postSuccess = true;
+      checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
       console.log('created post!');
       response = JSON.parse(aResponse);
       var postId = response.result[0].id;
@@ -63,21 +75,31 @@ uploadPost.addEventListener("submit", function() {
 
           bClient.put(endPoints.updateTable('posts').url, bBodyData, function(bResponse, bStatus) {
             if (bStatus == 200) {
+              locationSuccess = true;
+              checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
               console.log('added location!');
             } else {
-              console.log('failed to add location to post');
+              locationSuccess = false;
+              alert('failed to add location to post');
               console.log(bResponse, bStatus);
             }
           });
         });
       } else {
+        locationSuccess = true;
         console.log('device does not have geolocation');
       }
 
       /*
       (C) -- updating with pictures --
       */
-      if (form.files) {
+      var test = false;
+      if (form.files.length) {
+        test = true;
+      }
+      console.log(form.files, test);
+
+      if (form.files.length) {
         for (var i = 0; i < form.files.length; i++) {
           var file = form.files[i];
 
@@ -85,6 +107,8 @@ uploadPost.addEventListener("submit", function() {
 
           cClient.postImgur(file, function(cResponse, cStatus) {
             if (cStatus == 200) {
+              imgurSuccess = true;
+              checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
               var imgurResponse = JSON.parse(cResponse);
               var imgurUrl = imgurResponse.data.link;
               var imgurDeleteHash = imgurResponse.data.deletehash;
@@ -102,13 +126,18 @@ uploadPost.addEventListener("submit", function() {
               dClient.put(endPoints.updateTable('posts').url, dBodyData, function(dResponse,
               dStatus) {
                 if (dStatus == 200) {
+                  imageSuccess = true;
+                  checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
                   console.log('we uploaded and updated images!');
                 } else {
-                  console.log('failed to add imgur URL to post');
+                  imageSuccess = false;
+                  alert('failed to add imgur URL to post');
                   console.log(dResponse, dStatus);
                 }
               });
             } else {
+              imgurSuccess = false;
+              checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
               console.log('failed to upload to Imgur');
               console.log(cResponse, cStatus);
             }
@@ -116,10 +145,17 @@ uploadPost.addEventListener("submit", function() {
 
         }
 
+      } else {
+        imageSuccess = true;
+        imgurSuccess = true;
+        checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
+        console.log('no pictures to upload');
       }
 
     } else {
-      console.log('failed to make post');
+      postSuccess = false;
+      doneLoading();
+      alert('failed to make post');
       console.log(aResponse, aStatus);
     }
   });
@@ -138,7 +174,7 @@ chooseImage.addEventListener("change", function() {
   }
 });
 
-},{"../common_modules/_allowed_urls":2,"../common_modules/_http_client":3,"./_imgur_upload":4}],2:[function(require,module,exports){
+},{"../common_modules/_allowed_urls":2,"../common_modules/_http_client":3,"../common_modules/_loading":4,"./_imgur_upload":6}],2:[function(require,module,exports){
 var endPoints = (function() {
   return {
 
@@ -275,6 +311,115 @@ var HttpClient = function() {
 // Export the HttpClient module
 exports.HttpClient = HttpClient;
 },{}],4:[function(require,module,exports){
+var toggleClass = require('../common_modules/_modify_classes').toggleClass;
+var addClass = require('../common_modules/_modify_classes').addClass;
+var removeClass = require('../common_modules/_modify_classes').removeClass;
+
+var toggleLoading = function() {
+  var loadingPane = document.getElementById('loading-pane');
+  var contentLoading = document.getElementById('content-loading');
+
+  toggleClass(contentLoading, 'loading-done');
+  toggleClass(loadingPane, 'loading-done');
+};
+
+var showLoading = function() {
+  var loadingPane = document.getElementById('loading-pane');
+  var contentLoading = document.getElementById('content-loading');
+
+  removeClass(contentLoading, 'loading-done');
+  removeClass(loadingPane, 'loading-done');
+};
+
+var doneLoading = function() {
+  var loadingPane = document.getElementById('loading-pane');
+  var contentLoading = document.getElementById('content-loading');
+
+  addClass(contentLoading, 'loading-done');
+  addClass(loadingPane, 'loading-done');
+};
+
+var checkLoaded = function() {
+  // pass a list of booleans to this function that represent states changing in loading process
+  var params = Array.prototype.slice.call(arguments);
+
+  if (params.every(checkTrue)) {
+    doneLoading();
+  } else {
+    showLoading();
+  }
+
+  function checkTrue(value) {
+    if (value) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
+exports.toggleLoading = toggleLoading;
+exports.showLoading = showLoading;
+exports.doneLoading = doneLoading;
+exports.checkLoaded = checkLoaded;
+},{"../common_modules/_modify_classes":5}],5:[function(require,module,exports){
+var hasClass = function(node, className) {
+  var nodeClassNames = node.className.split(' ');
+
+  // chack the class isn't on the node already
+  if (nodeClassNames.indexOf(className) == -1) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
+var addClass = function(node, className) {
+  var nodeClassNames = node.className.split(' ');
+
+  // chack the class isn't on the node already
+  if (!hasClass(node, className)) {
+    node.className = nodeClassNames.join(' ').concat(' ', className);
+  }
+
+  return node;
+};
+
+var removeClass = function(node, className) {
+  var nodeClassNames = node.className.split(' ');
+  var newClasses = [];
+
+  for (var j = 0; j < nodeClassNames.length; j++) {
+    if (nodeClassNames[j] !== className) {
+      newClasses.push(nodeClassNames[j]);
+    }
+  }
+
+  node.className = newClasses.join(' ');
+
+  return node;
+};
+
+var toggleClass = function(node, className) {
+
+  // the node had the class already
+  if (hasClass(node, className)) {
+    removeClass(node, className);
+  } else {
+    // the node doesn't have the class
+    addClass(node, className);
+  }
+
+  return node;
+};
+
+
+// Export the HttpClient module
+exports.hasClass = hasClass;
+exports.addClass = addClass;
+exports.removeClass = removeClass;
+exports.toggleClass = toggleClass;
+},{}],6:[function(require,module,exports){
 var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
 

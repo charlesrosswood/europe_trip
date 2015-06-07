@@ -80,6 +80,9 @@ p {
 }
 
 @media (max-width: 745px) {
+html, body {
+  height: calc(100vh - 69px);
+}
 
   #header-container {
     margin-left: 0;

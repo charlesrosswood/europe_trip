@@ -1,6 +1,7 @@
 var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
-var toggleLoading = require('../common_modules/_loading').toggleLoading;
+var showLoading = require('../common_modules/_loading').showLoading;
+var doneLoading = require('../common_modules/_loading').doneLoading;
 
 var chosenPlaces = [];  // TODO: pointless?
 var lookup = [];
@@ -55,10 +56,10 @@ function initialiseGMaps(userPosts) {
 
   }
 
-  setTimeout(toggleLoading, 3000);
-
+  doneLoading();
 }
 
-google.maps.event.addDomListener(window, 'load', getNewUserPosts);
+showLoading();
 
 //// Add all listeners down here
+google.maps.event.addDomListener(window, 'load', getNewUserPosts);

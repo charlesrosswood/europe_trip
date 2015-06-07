@@ -9,3 +9,10 @@ menuIcon.addEventListener('click', function(event) {
   toggleClass(navPane, 'active');
 
 });
+
+// adding navigation via the href property on elements in the nac-pane class
+var navPane = document.getElementsByClassName('nav-pane')[0];
+
+navPane.addEventListener('click', function(target) {
+  window.location.href = event.target.getAttribute('href');
+});

@@ -66,13 +66,13 @@
 
         {% endblock %}
 
-			<div id="loading-pane" class="vert-center horiz-center">
+			<div id="loading-pane" class="loading-done vert-center horiz-center">
 				<img id="loading-icon"
 					 src="{{ url_for('static', filename='images/loading_icon_png.png') }}">
 			</div>
 
         <div class="content">
-			<div id="content-loading" class="background-color-0"></div>
+			<div id="content-loading" class="loading-done background-color-0"></div>
             {% block content %}{% endblock %}
         </div>
 

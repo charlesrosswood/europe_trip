@@ -1,7 +1,24 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
-var toggleLoading = require('../common_modules/_loading').toggleLoading;
+var showLoading = require('../common_modules/_loading').showLoading;
+var doneLoading = require('../common_modules/_loading').doneLoading;
+
+//function whichTransitionEvent(node){
+//    var t;
+//    var transitions = {
+//      'transition':'transitionend',
+//      'OTransition':'oTransitionEnd',
+//      'MozTransition':'transitionend',
+//      'WebkitTransition':'webkitTransitionEnd'
+//    }
+//
+//    for(t in transitions){
+//        if( node.style[t] !== undefined ){
+//            return transitions[t];
+//        }
+//    }
+//}
 
 var chosenPlaces = [];  // TODO: pointless?
 var lookup = [];
@@ -55,14 +72,16 @@ function initialiseGMaps(userPosts) {
     }
 
   }
-
-  setTimeout(toggleLoading, 3000);
+  
+  doneLoading();
+//  setTimeout(doneLoading, 3000);
 
 }
 
-google.maps.event.addDomListener(window, 'load', getNewUserPosts);
+showLoading();
 
 //// Add all listeners down here
+google.maps.event.addDomListener(window, 'load', getNewUserPosts);
 
 },{"../common_modules/_allowed_urls":2,"../common_modules/_http_client":3,"../common_modules/_loading":4}],2:[function(require,module,exports){
 var endPoints = (function() {
@@ -202,6 +221,8 @@ var HttpClient = function() {
 exports.HttpClient = HttpClient;
 },{}],4:[function(require,module,exports){
 var toggleClass = require('../common_modules/_modify_classes').toggleClass;
+var addClass = require('../common_modules/_modify_classes').addClass;
+var removeClass = require('../common_modules/_modify_classes').removeClass;
 
 var toggleLoading = function() {
   var loadingPane = document.getElementById('loading-pane');
@@ -211,7 +232,45 @@ var toggleLoading = function() {
   toggleClass(loadingPane, 'loading-done');
 };
 
+var showLoading = function() {
+  var loadingPane = document.getElementById('loading-pane');
+  var contentLoading = document.getElementById('content-loading');
+
+  removeClass(contentLoading, 'loading-done');
+  removeClass(loadingPane, 'loading-done');
+};
+
+var doneLoading = function() {
+  var loadingPane = document.getElementById('loading-pane');
+  var contentLoading = document.getElementById('content-loading');
+
+  addClass(contentLoading, 'loading-done');
+  addClass(loadingPane, 'loading-done');
+};
+
+var checkLoaded = function() {
+  // pass a list of booleans to this function that represent states changing in loading process
+  var params = Array.prototype.slice.call(arguments);
+
+  if (params.every(checkTrue)) {
+    doneLoading();
+  } else {
+    showLoading();
+  }
+
+  function checkTrue(value) {
+    if (value) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
 exports.toggleLoading = toggleLoading;
+exports.showLoading = showLoading;
+exports.doneLoading = doneLoading;
+exports.checkLoaded = checkLoaded;
 },{"../common_modules/_modify_classes":5}],5:[function(require,module,exports){
 var hasClass = function(node, className) {
   var nodeClassNames = node.className.split(' ');
