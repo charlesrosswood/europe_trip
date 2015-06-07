@@ -31,6 +31,58 @@
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
 }
 
+#postcard-container {
+  width: 100%;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  height: calc(100% - 66vh);
+  white-space: nowrap;
+}
+
+.postcard {
+  border-style: solid;
+  border-width: 2px;
+  margin: 6px;
+  overflow: hidden;
+  width: calc(100% - 12px - 4px);
+  max-width: 500px;
+  /*height: 500px;*/
+  height: calc(100% - 12px - 4px);
+  display: inline-block;
+}
+
+.post-date {
+  width: 66%;
+  text-align: right;
+  float: right;
+}
+
+.avatar > img {
+  width: 15%;
+  float: left;
+}
+
+.post-photo > img {
+  width: 50px;
+}
+/*
+#postcard-container {
+  height: calc(100% - 66vh);
+  width: 100%;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  /*white-space: nowrap;
+}
+
+.postcard {
+  float: left;
+  margin: 6px;
+  width: calc(100% - 12px);
+  max-width: 400px;
+  height: calc(100% - 12px);
+  white-space: normal;
+}
+*/
 @media (max-width: 745px) {
   #places-input {
     width: calc(100% - 175px);

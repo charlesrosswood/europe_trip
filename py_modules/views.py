@@ -4,6 +4,7 @@ from flask import render_template
 import py_modules.users as users
 import simplejson as json
 from operator import itemgetter
+import time
 
 
 def decode_request(request_obj):
@@ -31,12 +32,23 @@ class TemplateRenderers(object):
     @staticmethod
     def map_posts(db):
         user_uploads = users.User.get_all_users_uploads(db)
+        user_dict = {}
         all_posts = []
+
         for user in user_uploads:
+            print(user)
             all_posts.extend(user['posts'])
+            user_dict.update({user['user_id']: user})
+
         all_posts = sorted(all_posts, key=itemgetter('post_timestamp'), reverse=True)
 
-        return render_template('map_posts.html', context={'posts': all_posts}), 200
+        for post in all_posts:
+            timestamp_ms = post['post_timestamp']
+            human_readable_date = time.strftime('%d-%m-%Y %H:%M:%S', time.gmtime(timestamp_ms /
+                                                                              1000.0))
+            post['date'] = human_readable_date
+        return render_template('map_posts.html', context={'posts': all_posts, 'users':
+            user_dict}), 200
 
     @staticmethod
     def upload(db):

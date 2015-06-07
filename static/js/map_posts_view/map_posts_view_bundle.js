@@ -71,7 +71,7 @@ function initialiseGMaps(userPosts) {
 
 showLoading();
 
-//// Add all listeners down here
+// Add all listeners down here
 google.maps.event.addDomListener(window, 'load', getNewUserPosts);
 
 },{"../common_modules/_allowed_urls":2,"../common_modules/_http_client":3,"../common_modules/_loading":4}],2:[function(require,module,exports){

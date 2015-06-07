@@ -41,27 +41,29 @@
 
     <body class="background-color-0">
         {% block nav_header %}
-        <div id="header-container" class="color-6 delayed-fade-in">
-			<img id="menu-icon"
-				 class="menu phone"
-				 src="{{ url_for('static', filename='images/menu_icon_png.png') }}">
-            <div id="page-title" class="margin-left-5">
-                #europe2015
-            </div>
-        </div>
-		<div class="slide-in-from-right hline background-color-1a"></div>
-
-		<div class="nav-pane delayed-fade-in color-6">
-			<!--<div class="delayed-fade-in color-6">-->
-				<!--<div class="menu phone nav-item background-color-2">menu</div>-->
-				<!--&lt;!&ndash; navigation bar goes here&ndash;&gt;-->
-				<div href="{{ url_for('map_posts') }}"
-					 class="nav-item background-color-2 border-color-6">map</div>
-				<div href="{{ url_for('upload') }}"
-					 class="nav-item background-color-2 border-color-6">upload
+		<div id="page-top">
+			<div id="header-container" class="color-6 delayed-fade-in">
+				<img id="menu-icon"
+					 class="menu phone"
+					 src="{{ url_for('static', filename='images/menu_icon_png.png') }}">
+				<div id="page-title" class="margin-left-5">
+					#europe2015
 				</div>
-			<!--</div>-->
-			<!--<div class="phone slide-in-from-right hline background-color-1a"></div>-->
+			</div>
+			<div class="slide-in-from-right hline background-color-1a"></div>
+
+			<div class="nav-pane delayed-fade-in color-6">
+				<!--<div class="delayed-fade-in color-6">-->
+					<!--<div class="menu phone nav-item background-color-2">menu</div>-->
+					<!--&lt;!&ndash; navigation bar goes here&ndash;&gt;-->
+					<div href="{{ url_for('map_posts') }}"
+						 class="nav-item background-color-2 border-color-6">map</div>
+					<div href="{{ url_for('upload') }}"
+						 class="nav-item background-color-2 border-color-6">upload
+					</div>
+				<!--</div>-->
+				<!--<div class="phone slide-in-from-right hline background-color-1a"></div>-->
+			</div>
 		</div>
 
         {% endblock %}

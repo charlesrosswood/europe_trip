@@ -7,12 +7,14 @@ html, body {
   overflow: hidden;
 }
 
+.content {
+  height: calc(100% - 101px);
+}
+
 #header-container {
   height: 60px;
   font-size: 60px;
   line-height: 60px;
-  /*border-bottom: 1px solid #ccc;
-  margin-bottom: 10px*/
 }
 
 .body-font {
@@ -92,9 +94,14 @@ p {
 }
 
 @media (max-width: 745px) {
-html, body {
-  height: calc(100vh - 69px);
-}
+
+  html, body {
+    height: calc(100vh - 69px);
+  }
+
+  .content {
+    height: calc(100% - 55px);
+  }
 
   #header-container {
     margin-left: 0;

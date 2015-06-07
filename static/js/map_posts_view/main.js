@@ -70,5 +70,5 @@ function initialiseGMaps(userPosts) {
 
 showLoading();
 
-//// Add all listeners down here
+// Add all listeners down here
 google.maps.event.addDomListener(window, 'load', getNewUserPosts);
