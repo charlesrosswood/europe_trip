@@ -1,0 +1,23 @@
+#loading-pane {
+  position: absolute;
+  z-index: 3;
+  width: 20%;
+  min-width: 100px;
+  max-width: 200px;
+}
+
+.loading-done {
+  display: none;
+}
+
+#loading-icon {
+  width: 100%;
+}
+
+#content-loading {
+  position: absolute;
+  z-index: 2;
+  opacity: 0.8;
+  height:100%;
+  width: 100%;
+}

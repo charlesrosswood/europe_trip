@@ -1,3 +1,62 @@
+/* Drop-down menu */
+.nav-pane {
+  transition: max-height, 0.5s ease-in-out;
+  -o-transition: max-height, 0.5s ease-in-out;
+  -ms-transition: max-height, 0.5s ease-in-out;
+  -moz-transition: max-height, 0.5s ease-in-out;
+  -webkit-transition: max-height, 0.5s ease-in-out;
+}
+
+.nav-pane.active {
+  transition: max-height, 0.5s ease-in-out;
+  -o-transition: max-height, 0.5s ease-in-out;
+  -ms-transition: max-height, 0.5s ease-in-out;
+  -moz-transition: max-height, 0.5s ease-in-out;
+  -webkit-transition: max-height, 0.5s ease-in-out;
+}
+
+/* Spinning loading icon */
+#loading-icon {
+  animation: spin 2s linear infinite;
+  -o-animation: spin 2s linear infinite;
+  -ms-animation: spin 2s linear infinite;
+  -moz-animation: spin 2s linear infinite;
+  -webkit-animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@-o-keyframes spin {
+  100% {
+    -o-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+  }
+}
+
+@-ms-keyframes spin {
+  100% {
+    -ms-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+  }
+}
+
+@-moz-keyframes spin {
+  100% {
+    -moz-transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
 /* Fading an element in after 1 second */
 .delayed-fade-in {
   opacity: 0;

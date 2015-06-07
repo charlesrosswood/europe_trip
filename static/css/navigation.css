@@ -16,33 +16,34 @@
   margin-bottom: 6px;
 }
 
-.phone {
+.menu {
   display: none;
 }
 
 /* making the nav-pane responsive to phones */
 @media (max-width: 745px) {
   .nav-pane {
+    max-height: 0px;
+    overflow: hidden;
     margin-bottom: 0px;
+  }
+
+  .nav-pane.active {
+    max-height: 100px;
   }
 
   .nav-item {
     width: calc(100% - 24px);
-    display: none;
+    display: block;
     margin-top: 6px;
     margin-bottom: 6px;
   }
 
-  .phone {
-    display: block;
-  }
-
-  .nav-item.active {
-    display: block;
-  }
-
   .menu {
     display: block;
+    height: 18px; /* should be calc(100%-2*margin) */
+    float: left;
+    margin: 12px;
   }
 
 

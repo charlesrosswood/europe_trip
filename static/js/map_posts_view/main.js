@@ -1,5 +1,6 @@
 var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
+var toggleLoading = require('../common_modules/_loading').toggleLoading;
 
 var chosenPlaces = [];  // TODO: pointless?
 var lookup = [];
@@ -54,6 +55,7 @@ function initialiseGMaps(userPosts) {
 
   }
 
+  setTimeout(toggleLoading, 3000);
 
 }
 

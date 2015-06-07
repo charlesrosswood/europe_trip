@@ -1,16 +1,3 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var toggleClass = require('../common_modules/_modify_classes').toggleClass;
-
-// Adding clickable links to all elements under the nav-pane
-var menuIcon = document.getElementById('menu-icon');
-
-menuIcon.addEventListener('click', function(event) {
-  var navPane = document.getElementsByClassName('nav-pane')[0];
-
-  toggleClass(navPane, 'active');
-
-});
-},{"../common_modules/_modify_classes":2}],2:[function(require,module,exports){
 var hasClass = function(node, className) {
   var nodeClassNames = node.className.split(' ');
 
@@ -67,4 +54,3 @@ exports.hasClass = hasClass;
 exports.addClass = addClass;
 exports.removeClass = removeClass;
 exports.toggleClass = toggleClass;
-},{}]},{},[1]);

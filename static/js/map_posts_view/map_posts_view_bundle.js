@@ -1,6 +1,7 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
+var toggleLoading = require('../common_modules/_loading').toggleLoading;
 
 var chosenPlaces = [];  // TODO: pointless?
 var lookup = [];
@@ -55,6 +56,7 @@ function initialiseGMaps(userPosts) {
 
   }
 
+  setTimeout(toggleLoading, 3000);
 
 }
 
@@ -62,7 +64,7 @@ google.maps.event.addDomListener(window, 'load', getNewUserPosts);
 
 //// Add all listeners down here
 
-},{"../common_modules/_allowed_urls":2,"../common_modules/_http_client":3}],2:[function(require,module,exports){
+},{"../common_modules/_allowed_urls":2,"../common_modules/_http_client":3,"../common_modules/_loading":4}],2:[function(require,module,exports){
 var endPoints = (function() {
   return {
 
@@ -198,4 +200,73 @@ var HttpClient = function() {
 
 // Export the HttpClient module
 exports.HttpClient = HttpClient;
+},{}],4:[function(require,module,exports){
+var toggleClass = require('../common_modules/_modify_classes').toggleClass;
+
+var toggleLoading = function() {
+  var loadingPane = document.getElementById('loading-pane');
+  var contentLoading = document.getElementById('content-loading');
+
+  toggleClass(contentLoading, 'loading-done');
+  toggleClass(loadingPane, 'loading-done');
+};
+
+exports.toggleLoading = toggleLoading;
+},{"../common_modules/_modify_classes":5}],5:[function(require,module,exports){
+var hasClass = function(node, className) {
+  var nodeClassNames = node.className.split(' ');
+
+  // chack the class isn't on the node already
+  if (nodeClassNames.indexOf(className) == -1) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
+var addClass = function(node, className) {
+  var nodeClassNames = node.className.split(' ');
+
+  // chack the class isn't on the node already
+  if (!hasClass(node, className)) {
+    node.className = nodeClassNames.join(' ').concat(' ', className);
+  }
+
+  return node;
+};
+
+var removeClass = function(node, className) {
+  var nodeClassNames = node.className.split(' ');
+  var newClasses = [];
+
+  for (var j = 0; j < nodeClassNames.length; j++) {
+    if (nodeClassNames[j] !== className) {
+      newClasses.push(nodeClassNames[j]);
+    }
+  }
+
+  node.className = newClasses.join(' ');
+
+  return node;
+};
+
+var toggleClass = function(node, className) {
+
+  // the node had the class already
+  if (hasClass(node, className)) {
+    removeClass(node, className);
+  } else {
+    // the node doesn't have the class
+    addClass(node, className);
+  }
+
+  return node;
+};
+
+
+// Export the HttpClient module
+exports.hasClass = hasClass;
+exports.addClass = addClass;
+exports.removeClass = removeClass;
+exports.toggleClass = toggleClass;
 },{}]},{},[1]);
