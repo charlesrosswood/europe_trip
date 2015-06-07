@@ -39,6 +39,9 @@ function initialiseGMaps(userPosts) {
   var searchBox = new google.maps.places.SearchBox(input); // turn the HTML input into places search
 
   console.log(userPosts);
+
+  var bounds = new google.maps.LatLngBounds();
+
   //  for every user
   for (var i = 0; i < userPosts.users.length; i++) {
     var user = userPosts.users[i];
@@ -47,14 +50,20 @@ function initialiseGMaps(userPosts) {
     // for every post by that user
     for (var j = 0; j < posts.length; j++) {
       var post = posts[j];
-      var marker = new google.maps.Marker({
-        position: new google.maps.LatLng(post.latitude, post.longitude),
-        map: map,
-        title: user.name
-      });
+      if (post.latitude && post.longitude) {
+        var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(post.latitude, post.longitude),
+          map: map,
+          title: user.name
+        });
+        // to bind the map to the markers
+        bounds.extend(marker.getPosition());
+      }
     }
 
   }
+
+  map.fitBounds(bounds);
 
   doneLoading();
 }

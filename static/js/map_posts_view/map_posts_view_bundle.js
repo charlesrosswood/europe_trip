@@ -4,22 +4,6 @@ var endPoints = require('../common_modules/_allowed_urls').endPoints;
 var showLoading = require('../common_modules/_loading').showLoading;
 var doneLoading = require('../common_modules/_loading').doneLoading;
 
-//function whichTransitionEvent(node){
-//    var t;
-//    var transitions = {
-//      'transition':'transitionend',
-//      'OTransition':'oTransitionEnd',
-//      'MozTransition':'transitionend',
-//      'WebkitTransition':'webkitTransitionEnd'
-//    }
-//
-//    for(t in transitions){
-//        if( node.style[t] !== undefined ){
-//            return transitions[t];
-//        }
-//    }
-//}
-
 var chosenPlaces = [];  // TODO: pointless?
 var lookup = [];
 var markers = [];
@@ -56,6 +40,9 @@ function initialiseGMaps(userPosts) {
   var searchBox = new google.maps.places.SearchBox(input); // turn the HTML input into places search
 
   console.log(userPosts);
+
+  var bounds = new google.maps.LatLngBounds();
+
   //  for every user
   for (var i = 0; i < userPosts.users.length; i++) {
     var user = userPosts.users[i];
@@ -64,18 +51,22 @@ function initialiseGMaps(userPosts) {
     // for every post by that user
     for (var j = 0; j < posts.length; j++) {
       var post = posts[j];
-      var marker = new google.maps.Marker({
-        position: new google.maps.LatLng(post.latitude, post.longitude),
-        map: map,
-        title: user.name
-      });
+      if (post.latitude && post.longitude) {
+        var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(post.latitude, post.longitude),
+          map: map,
+          title: user.name
+        });
+        // to bind the map to the markers
+        bounds.extend(marker.getPosition());
+      }
     }
 
   }
-  
-  doneLoading();
-//  setTimeout(doneLoading, 3000);
 
+  map.fitBounds(bounds);
+
+  doneLoading();
 }
 
 showLoading();
