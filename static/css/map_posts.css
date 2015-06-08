@@ -49,6 +49,7 @@
   /*height: 500px;*/
   height: calc(100% - 12px - 4px);
   display: inline-block;
+  vertical-align: top;
 }
 
 .post-date {

@@ -18,25 +18,25 @@
 
 		<div id="postcard-container" class="color-6 body-font">
 			{% for post in context.posts %}
-				<span class="postcard border-color-6">
+				<div class="postcard border-color-6">
 					<div class="postcard-header">
 						<div class="post-date">
 							{{ post.date }}
 						</div>
-						<span class="avatar">
+						<div class="avatar">
 							<img
 									src="{{ url_for('static', filename='images/avatars/' + context.users[post.user_id].username + '.png') }}">
-						</span><br/>
+						</div><br/>
 					</div>
-					<span class="status-text">
+					<div class="status-text">
 						{{ post.status_entry }}
-					</span><br/>
-					<span class="post-photo">
+					</div><br/>
+					<div class="post-photo">
 						{% if post.image_url %}
 							<img src="{{ post.image_url }}">
 						{% endif %}
-					</span>
-				</span>
+					</div>
+				</div>
 			{% endfor %}
 		</div>
 	{% endblock %}
