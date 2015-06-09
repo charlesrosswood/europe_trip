@@ -94,4 +94,7 @@
     height: 50vh;
   }
 
+  #postcard-container {
+    height: calc(100% - 50vh);
+  }
 }
