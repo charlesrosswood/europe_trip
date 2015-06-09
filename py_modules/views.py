@@ -1,6 +1,7 @@
 __author__ = 'cwod'
 
 from flask import render_template
+from flask import Response
 import py_modules.users as users
 import simplejson as json
 from operator import itemgetter
@@ -69,21 +70,14 @@ class RestfulApis(object):
         else:
             where_string = None
 
-        # try:
         db_response = db.select_from_table(tablename=tablename, where=where_string,
             columns=columns)
-        return json.dumps(db_response), db_response['status']
-        # except psycopg2.ProgrammingError:
-        #     abort(500)
-            # if id is None or str(id).lower() == 'null':
-            #     db_response = db.select_from_table(tablename=tablename)
-            #     return json.dumps(db_response), db_response['status']
-            # else:
-            #     where_string = 'id=%s' % (id,)
-            #     try:
-            #
-            #     except:  # TODO: catch all exception - bad
-            #         abort(404)
+
+        response_object = Response(response=json.dumps(db_response), status=db_response[
+            'status'], mimetype='application/json')
+
+        # response_object.headers['Test'] = 1234567890  # this is how you add headers
+        return response_object
 
     @staticmethod
     def write(request, db, tablename):
@@ -108,12 +102,17 @@ class RestfulApis(object):
             columns = None
         values = payload['values']
 
-        insert_success = db.insert_into_table(
+        db_response = db.insert_into_table(
             tablename=tablename,
             values=values,
             columns=columns
         )
-        return json.dumps(insert_success), insert_success['status']
+
+        response_object = Response(response=json.dumps(db_response), status=db_response[
+            'status'], mimetype='application/json')
+
+        # response_object.headers['Test'] = 1234567890  # this is how you add headers
+        return response_object
 
     @staticmethod
     def update(request, db, tablename):
@@ -134,9 +133,14 @@ class RestfulApis(object):
         else:
             where_clauses = None
 
-        update_success = db.update_table(tablename, payload['set_clauses'],
+        db_response = db.update_table(tablename, payload['set_clauses'],
             where_clauses=where_clauses)
-        return json.dumps(update_success), update_success['status']
+
+        response_object = Response(response=json.dumps(db_response), status=db_response[
+            'status'], mimetype='application/json')
+
+        return response_object
+        # return json.dumps(db_response), db_response['status']
 
     @staticmethod
     def update_posts(db):
@@ -144,5 +148,9 @@ class RestfulApis(object):
         context = {
             'users': user_uploads
         }
-        return json.dumps(context), 200
+
+        response_object = Response(response=json.dumps(context), status=200,
+            mimetype='application/json')
+
+        return response_object
 
