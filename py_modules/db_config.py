@@ -31,7 +31,7 @@ class DatabaseConfig(object):
 
     """
 
-    def __init__(self, host, dbname, user='postgres', password='postgres', port=5432):
+    def __init__(self, host, dbname, user, password, port):
         """
         Use this to instantiate the Database config class
 
@@ -79,10 +79,13 @@ class DatabaseConfig(object):
         else:
             select_statement = 'SELECT %s FROM %s.%s' % (columns_to_select, schema, tablename)
 
-        if where is not None:  # should be a list
+        if where:  # should be a list
             if not isinstance(where, list):
                 where = [where]
             select_statement += ' WHERE %s' % (' AND '.join(where),)
+        else:
+            #  necessary to cover off empty list
+            where = None
         print(select_statement)
         cleaned_records = []
         with self.connection.cursor() as db_cursor:
@@ -104,7 +107,9 @@ class DatabaseConfig(object):
 
                 response = ReturnStatus(return_value=cleaned_records, status_code=200,
                     message='statement: "%s"' % (select_statement,))
-            except (psycopg2.InternalError, psycopg2.ProgrammingError) as e:
+            except (psycopg2.InternalError,
+                    psycopg2.ProgrammingError,
+                    psycopg2.IntegrityError) as e:
                 self.connection.rollback()
                 response = ReturnStatus(return_value=None, status_code=500,
                     message='We failed to execute the statement: "%s"' % (select_statement,),
@@ -138,7 +143,9 @@ class DatabaseConfig(object):
             'cursor_unique_name', cursor_factory=psycopg2.extras.DictCursor) as db_cursor:
             try:
                 db_cursor.execute(select_statement)
-            except (psycopg2.InternalError, psycopg2.ProgrammingError):
+            except (psycopg2.InternalError,
+                    psycopg2.ProgrammingError,
+                    psycopg2.IntegrityError) as e:
                 self.connection.rollback()
 
             return db_cursor  # note this is now an iterable
@@ -182,7 +189,9 @@ class DatabaseConfig(object):
                 self.connection.commit()
                 response = ReturnStatus(return_value=return_dict, status_code=201,
                     message='statement: ''"%s"' % (SQL_statement, ))
-            except (psycopg2.InternalError, psycopg2.ProgrammingError) as e:
+            except (psycopg2.InternalError,
+                    psycopg2.ProgrammingError,
+                    psycopg2.IntegrityError) as e:
                 self.connection.rollback()
                 response = ReturnStatus(return_value=None, status_code=500,
                     message='statement: "%s"' % (SQL_statement, ), error_message=e.pgerror)
@@ -221,9 +230,49 @@ class DatabaseConfig(object):
                 self.connection.commit()
                 response = ReturnStatus(return_value=return_dict, status_code=200,
                     message='statement: ''"%s"' % (update_string, ))
-            except (psycopg2.InternalError, psycopg2.ProgrammingError) as e:
+            except (psycopg2.InternalError,
+                    psycopg2.ProgrammingError,
+                    psycopg2.IntegrityError) as e:
                 self.connection.rollback()
                 response = ReturnStatus(return_value=None, status_code=500,
                     message='statement: "%s"' % (update_string, ), error_message=e.pgerror)
+
+        return response.get_dict()
+
+    def delete_from_table(self, tablename, where_clauses=None, schema=None):
+        """
+        Allows removal of a database row
+        :param tablename:
+        :param where_clauses:
+        :param schema:
+        :return:
+        """
+        if schema is None:
+           delete_string = 'DELETE FROM %s ' % (tablename,)
+        else:
+            delete_string = 'DELETE FROM %s.%s ' % (schema, tablename)
+
+        if where_clauses:
+            delete_string += ' WHERE %s' % (','.join(where_clauses))
+
+        delete_string += ' RETURNING id'
+
+        with self.connection.cursor() as cursor:
+            try:
+                cursor.execute(delete_string)
+                row_ids = cursor.fetchall()
+                return_dict = [{
+                    'ids': [id[0] for id in row_ids]
+                }]
+
+                self.connection.commit()
+                response = ReturnStatus(return_value=return_dict, status_code=200,
+                    message='statement: ''"%s"' % (delete_string, ))
+            except (psycopg2.InternalError,
+                    psycopg2.ProgrammingError,
+                    psycopg2.IntegrityError) as e:
+                self.connection.rollback()
+                response = ReturnStatus(return_value=None, status_code=500,
+                    message='statement: "%s"' % (delete_string, ), error_message=e.pgerror)
 
         return response.get_dict()

@@ -2,7 +2,7 @@ __author__ = 'cwod'
 
 from flask import Flask
 from flask import request
-import py_modules.db_config as database
+from py_modules.views import DatabaseApis
 import platform
 import os
 import py_modules.views as views
@@ -26,7 +26,7 @@ else:  # heroku
 
     _DEBUG_ = False
 
-db = database.DatabaseConfig(host=_HOST_, dbname=_DBNAME_, user=_USER_,
+db = DatabaseApis(host=_HOST_, dbname=_DBNAME_, user=_USER_,
     password=_PASSWORD_)
 
 app = Flask(__name__)
@@ -45,7 +45,7 @@ def upload(*args, **kwargs):
 # RESTful views that act as APIs
 @app.route('/get-updated-posts', methods=['GET'])
 def update_posts():
-    return views.RestfulApis.update_posts(db)
+    return db.get_updated_posts()
 
 # RESTful database methods
 # TODO: Fix for SQL injection
@@ -56,22 +56,19 @@ def read(tablename):
     :param tablename:
     :return:
     """
-    id = request.args.get('id', None)
-    columns = request.args.get('columns', '').split(',')
-    if len(columns) == 1 and not columns[0]:
-        columns = None
-    print(columns, type(columns))
-    return views.RestfulApis.read(db, tablename, columns, id)
-
+    return db.read(request, tablename)
 
 @app.route('/write/<tablename>', methods=['POST'])
 def write(tablename):
-    return views.RestfulApis.write(request, db, tablename)
+    return db.write(request, tablename)
 
 @app.route('/update/<tablename>', methods=['PUT'])
 def update(tablename):
-    return views.RestfulApis.update(request, db, tablename)
+    return db.update(request, tablename)
 
+@app.route('/delete/<tablename>', methods=['DELETE'])
+def delete(tablename):
+    return db.delete(request, tablename)
 
 # Handling HTTP errors
 @app.errorhandler(400)

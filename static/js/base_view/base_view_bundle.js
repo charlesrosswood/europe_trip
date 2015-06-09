@@ -15,7 +15,10 @@ menuIcon.addEventListener('click', function(event) {
 var navPane = document.getElementsByClassName('nav-pane')[0];
 
 navPane.addEventListener('click', function(target) {
-  window.location.href = event.target.getAttribute('href');
+  var href = event.target.getAttribute('href');
+  if (href !== null) {
+    window.location.href = href;
+  }
 });
 },{"../common_modules/_modify_classes":2}],2:[function(require,module,exports){
 var hasClass = function(node, className) {

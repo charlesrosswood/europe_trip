@@ -8,6 +8,8 @@ var chosenPlaces = [];  // TODO: pointless?
 var lookup = [];
 var markers = [];
 
+var postcardContainer = document.getElementById('postcard-container');
+
 function getNewUserPosts() {
   var aClient = new HttpClient();
   var url = endPoints.getUpdatedPosts.url;
@@ -16,7 +18,6 @@ function getNewUserPosts() {
     if (status == 200) {
       var userPosts = JSON.parse(response);
 
-      // TODO: render the x-carousel at the bottom of the page with the posts in
       initialiseGMaps(userPosts);
     } else {
       // TODO: render error
@@ -51,18 +52,29 @@ function initialiseGMaps(userPosts) {
     // for every post by that user
     for (var j = 0; j < posts.length; j++) {
       var post = posts[j];
-      if (post.latitude && post.longitude) {
+
         var marker = new google.maps.Marker({
           position: new google.maps.LatLng(post.latitude, post.longitude),
           map: map,
-          title: user.name
+          title: user.name,
+          id: post.id
         });
+
+        google.maps.event.addListener(marker, 'click', function(id) {
+          return function() {
+            console.log('[data-postcard-id="' + id + '"]');
+            var postcardNode = document.querySelectorAll('[data-postcard-id="' + id + '"]')[0];
+            console.log(postcardNode);
+            var postcardBounds = postcardNode.getBoundingClientRect();
+            console.log(postcardBounds);
+            postcardBounds.trans
+            postcardContainer.scrollLeft = postcardBounds.left;
+          }
+        }(marker.id));
         // to bind the map to the markers
         bounds.extend(marker.getPosition());
       }
     }
-
-  }
 
   map.fitBounds(bounds);
 
@@ -73,6 +85,15 @@ showLoading();
 
 // Add all listeners down here
 google.maps.event.addDomListener(window, 'load', getNewUserPosts);
+
+
+postcardContainer.addEventListener('click', function(event) {
+  var postcardId = event.target.getAttribute('data-postcard-id');
+  if (postcardId !== null) {
+//    TODO: do something, pop up big postcard
+    var that = null;
+  }
+});
 
 },{"../common_modules/_allowed_urls":2,"../common_modules/_http_client":3,"../common_modules/_loading":4}],2:[function(require,module,exports){
 var endPoints = (function() {

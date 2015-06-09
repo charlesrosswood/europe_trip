@@ -14,5 +14,8 @@ menuIcon.addEventListener('click', function(event) {
 var navPane = document.getElementsByClassName('nav-pane')[0];
 
 navPane.addEventListener('click', function(target) {
-  window.location.href = event.target.getAttribute('href');
+  var href = event.target.getAttribute('href');
+  if (href !== null) {
+    window.location.href = href;
+  }
 });

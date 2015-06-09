@@ -3,6 +3,7 @@ __author__ = 'cwod'
 from flask import render_template
 from flask import Response
 import py_modules.users as users
+from py_modules.db_config import DatabaseConfig
 import simplejson as json
 from operator import itemgetter
 import time
@@ -37,7 +38,6 @@ class TemplateRenderers(object):
         all_posts = []
 
         for user in user_uploads:
-            print(user)
             all_posts.extend(user['posts'])
             user_dict.update({user['user_id']: user})
 
@@ -45,7 +45,7 @@ class TemplateRenderers(object):
 
         for post in all_posts:
             timestamp_ms = post['post_timestamp']
-            human_readable_date = time.strftime('%d-%m-%Y %H:%M:%S', time.gmtime(timestamp_ms /
+            human_readable_date = time.strftime('%d-%m-%Y %H:%M', time.gmtime(timestamp_ms /
                                                                               1000.0))
             post['date'] = human_readable_date
         return render_template('map_posts.html', context={'posts': all_posts, 'users':
@@ -58,19 +58,29 @@ class TemplateRenderers(object):
         return render_template('upload.html', context={'users': all_users}), 200
 
 
-class RestfulApis(object):
+class DatabaseApis(DatabaseConfig):
     """
 
     """
+    def __init__(self, host, dbname, user='postgres', password='postgres', port=5432):
+        super(DatabaseApis, self).__init__(host, dbname, user, password, port)
 
-    @staticmethod
-    def read(db, tablename, columns=None, id=None):
-        if id is not None:
-            where_string = 'id=%s' % (id,)
-        else:
-            where_string = None
 
-        db_response = db.select_from_table(tablename=tablename, where=where_string,
+    def read(self, request, tablename):
+        columns = request.args.get('columns', '').split(',')
+        if len(columns) == 1 and not columns[0]:
+            columns = None
+
+        where_list = []
+        for key in request.args:
+            if key != 'columns':
+                value = request.args.get(key, '')
+                if value.lower() == 'null' or value.lower() == 'none':
+                    value = None
+                where_list.append('%s=%s' % (key, value))
+        where_list = [where.replace('"', "'") for where in where_list]
+
+        db_response = self.select_from_table(tablename=tablename, where=where_list,
             columns=columns)
 
         response_object = Response(response=json.dumps(db_response), status=db_response[
@@ -79,8 +89,7 @@ class RestfulApis(object):
         # response_object.headers['Test'] = 1234567890  # this is how you add headers
         return response_object
 
-    @staticmethod
-    def write(request, db, tablename):
+    def write(self, request, tablename):
         """
         The POST request should be sent to: http://<address of server>/write/<table name to write to>
         The POST request should have a payload body like this:
@@ -102,7 +111,7 @@ class RestfulApis(object):
             columns = None
         values = payload['values']
 
-        db_response = db.insert_into_table(
+        db_response = self.insert_into_table(
             tablename=tablename,
             values=values,
             columns=columns
@@ -114,8 +123,7 @@ class RestfulApis(object):
         # response_object.headers['Test'] = 1234567890  # this is how you add headers
         return response_object
 
-    @staticmethod
-    def update(request, db, tablename):
+    def update(self, request, tablename):
         """
         The PUT request should have body parameters like:
         {
@@ -133,7 +141,7 @@ class RestfulApis(object):
         else:
             where_clauses = None
 
-        db_response = db.update_table(tablename, payload['set_clauses'],
+        db_response = self.update_table(tablename, payload['set_clauses'],
             where_clauses=where_clauses)
 
         response_object = Response(response=json.dumps(db_response), status=db_response[
@@ -142,9 +150,33 @@ class RestfulApis(object):
         return response_object
         # return json.dumps(db_response), db_response['status']
 
-    @staticmethod
-    def update_posts(db):
-        user_uploads = users.User.get_all_users_uploads(db)
+    def delete(self, request, tablename):
+        """
+
+        :param request:
+        :param db:
+        :param tablename:
+        :return:
+        """
+        where_list = []
+        for key in request.args:
+            if key != 'columns':
+                value = request.args.get(key, '')
+                if value.lower() == 'null' or value.lower() == 'none':
+                    value = None
+                where_list.append('%s=%s' % (key, value))
+        where_list = [where.replace('"', "'") for where in where_list]
+
+        db_response = self.delete_from_table(tablename=tablename, where_clauses=where_list)
+
+        response_object = Response(response=json.dumps(db_response), status=db_response[
+            'status'], mimetype='application/json')
+
+        # response_object.headers['Test'] = 1234567890  # this is how you add headers
+        return response_object
+
+    def get_updated_posts(self):
+        user_uploads = users.User.get_all_users_uploads(self)
         context = {
             'users': user_uploads
         }
@@ -153,4 +185,3 @@ class RestfulApis(object):
             mimetype='application/json')
 
         return response_object
-
