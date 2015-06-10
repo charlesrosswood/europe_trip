@@ -66,8 +66,7 @@ function initialiseGMaps(userPosts) {
             console.log(postcardNode);
             var postcardBounds = postcardNode.getBoundingClientRect();
             console.log(postcardBounds);
-            postcardBounds.trans
-            postcardContainer.scrollLeft = postcardBounds.left;
+            postcardContainer.scrollLeft = postcardBounds.left - postcardContainer.scrollLeft;
           }
         }(marker.id));
         // to bind the map to the markers
