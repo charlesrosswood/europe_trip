@@ -32,8 +32,9 @@
 }
 
 #postcard-container {
+  position: relative;
   width: 100%;
-  overflow-x: scroll;
+  overflow-x: hidden;
   overflow-y: hidden;
   height: calc(100% - 66vh);
   white-space: nowrap;
@@ -66,6 +67,22 @@
 .post-photo > img {
   width: 200px;
 }
+
+.carousel-arrow {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  height: 100%;
+}
+
+.carousel-arrow.left {
+  left: 0;
+}
+
+.carousel-arrow.right{
+  right: 0;
+}
+
 /*
 #postcard-container {
   height: calc(100% - 66vh);

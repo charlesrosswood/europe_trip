@@ -6,6 +6,7 @@
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7oYhGu2nYJUFZOEVh1Z7qdpjlriSzdEc&libraries=places">
         </script>
 
+
 		<link rel='stylesheet' type='text/css'
 			href="{{ url_for('static', filename='css/map_posts.css') }}">
     {% endblock %}
@@ -17,6 +18,8 @@
 		</div>
 
 		<div id="postcard-container" class="color-6 body-font">
+			<img id="left-arrow" class="carousel-arrow left"
+				 src="{{ url_for('static', filename='images/left_arrow_png.png') }}">
 			{% for post in context.posts %}
 				<div class="postcard border-color-6" data-postcard-id="{{ post.id }}">
 					<div class="postcard-header">
@@ -38,10 +41,13 @@
 					</div>
 				</div>
 			{% endfor %}
+			<img id="right-arrow" class="carousel-arrow right"
+				 src="{{ url_for('static', filename='images/right_arrow_png.png') }}">
 		</div>
 	{% endblock %}
 
     {% block tail_scripts %}
 		<script type="text/javascript"
-			src="{{ url_for('static', filename='js/map_posts_view/map_posts_view_bundle.js') }}"></script>
+			src="{{ url_for('static', filename='js/map_posts_view/map_posts_view_bundle.js') }}">
+		</script>
 	{% endblock %}

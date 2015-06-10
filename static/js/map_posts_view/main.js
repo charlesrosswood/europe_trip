@@ -39,8 +39,6 @@ function initialiseGMaps(userPosts) {
 
   var searchBox = new google.maps.places.SearchBox(input); // turn the HTML input into places search
 
-  console.log(userPosts);
-
   var bounds = new google.maps.LatLngBounds();
 
   //  for every user
@@ -52,6 +50,7 @@ function initialiseGMaps(userPosts) {
     for (var j = 0; j < posts.length; j++) {
       var post = posts[j];
 
+      if (post.latitude != null && post.longitude != null) {
         var marker = new google.maps.Marker({
           position: new google.maps.LatLng(post.latitude, post.longitude),
           map: map,
@@ -72,6 +71,7 @@ function initialiseGMaps(userPosts) {
         bounds.extend(marker.getPosition());
       }
     }
+  }
 
   map.fitBounds(bounds);
 
@@ -83,7 +83,6 @@ showLoading();
 // Add all listeners down here
 google.maps.event.addDomListener(window, 'load', getNewUserPosts);
 
-
 postcardContainer.addEventListener('click', function(event) {
   var postcardId = event.target.getAttribute('data-postcard-id');
   if (postcardId !== null) {
@@ -91,3 +90,14 @@ postcardContainer.addEventListener('click', function(event) {
     var that = null;
   }
 });
+
+var leftCarouselArrow = document.getElementById('left-arrow');
+leftCarouselArrow.addEventListener('click', function() {
+  // TODO: CRW - add a translate property to the size of a postcard left
+});
+
+var rightCarouselArrow = document.getElementById('right-arrow');
+rightCarouselArrow.addEventListener('click', function() {
+  // TODO: CRW - add a translate property to the size of a postcard right
+});
+
