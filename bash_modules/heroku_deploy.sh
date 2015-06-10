@@ -9,4 +9,4 @@ git add --all :/
 git commit -m "Deploying to Heroku..."
 git push origin $branch:deploy
 
-printf "\n\nWARNING! Commit not pushed to current branch $branch, please:\n\n\tgit push $branch\n\n"
+printf "\n\nWARNING! Commit not pushed to current branch $branch, please:\n\n\tgit pull\n\tgit push $branch\n\n"
