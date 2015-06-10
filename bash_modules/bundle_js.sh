@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-main_js_path="./static/js/"
+main_js_path="../static/js/"
 declare -a list_of_main_js
 
 for filename in $(ls $main_js_path);
