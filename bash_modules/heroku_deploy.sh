@@ -5,7 +5,7 @@ branch=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
 ./bundle_js.sh
 
 printf "\nPushing all changes to deployment branch...\n"
-git add --all
+git add --all :/
 git commit -m "Deploying to Heroku..."
 git push origin $branch:deploy
 

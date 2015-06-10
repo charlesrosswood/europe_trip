@@ -64,10 +64,8 @@ function initialiseGMaps(userPosts) {
           return function() {
             console.log('[data-postcard-id="' + id + '"]');
             var postcardNode = document.querySelectorAll('[data-postcard-id="' + id + '"]')[0];
-            console.log(postcardNode);
             var postcardBounds = postcardNode.getBoundingClientRect();
-            console.log(postcardBounds);
-            postcardBounds.trans
+            console.log(postcardBounds.left, postcardContainer.scrollLeft);
             postcardContainer.scrollLeft = postcardBounds.left;
           }
         }(marker.id));
