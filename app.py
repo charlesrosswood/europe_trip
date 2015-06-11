@@ -24,7 +24,7 @@ else:  # heroku
     _PASSWORD_ = db_url.split(':')[2].split('@')[0]
     _PORT_ = int(db_url.split(':')[-1].split('/')[0])
 
-    _DEBUG_ = False
+    _DEBUG_ = True
 
 db = DatabaseApis(host=_HOST_, dbname=_DBNAME_, user=_USER_,
     password=_PASSWORD_)
