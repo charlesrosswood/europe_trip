@@ -34,7 +34,7 @@
 #postcard-container {
   position: relative;
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: scroll;
   overflow-y: hidden;
   height: calc(100% - 66vh);
   white-space: nowrap;

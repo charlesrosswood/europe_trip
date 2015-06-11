@@ -2,6 +2,7 @@ __author__ = 'cwod'
 
 from flask import render_template
 from flask import Response
+from flask import url_for
 import py_modules.users as users
 from py_modules.db_config import DatabaseConfig
 import simplejson as json
@@ -177,6 +178,11 @@ class DatabaseApis(DatabaseConfig):
 
     def get_updated_posts(self):
         user_uploads = users.User.get_all_users_uploads(self)
+        for user in user_uploads:
+            avatar_filename = '.'.join([user['username'],'png'])
+            user_avatar_url = url_for('static', filename='images/avatars/%s' % (avatar_filename,))
+            user['avatar_url'] = user_avatar_url
+
         context = {
             'users': user_uploads
         }

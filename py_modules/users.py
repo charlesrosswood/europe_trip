@@ -80,7 +80,6 @@ class User(object):
     @staticmethod
     def get_all_users_uploads(db):
         user_list = User.get_all_users_from_db(db)
-        print(user_list)
         user_uploads_list = []
         if user_list:
             for user in user_list:

@@ -17,12 +17,26 @@ function getNewUserPosts() {
     if (status == 200) {
       var userPosts = JSON.parse(response);
 
+      console.log(userPosts);
+
       initialiseGMaps(userPosts);
     } else {
       // TODO: render error
     }
   });
 
+}
+
+function addHexColor(c1, c2) {
+  var hexStr = (parseInt(c1, 16) + parseInt(c2, 16)).toString(16);
+  while (hexStr.length < 6) { hexStr = '0' + hexStr; } // Zero pad.
+  return hexStr;
+}
+
+function pad(n, width, z) {
+  z = z || '0';
+  n = n + '';
+  return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
 }
 
 function initialiseGMaps(userPosts) {
@@ -41,22 +55,40 @@ function initialiseGMaps(userPosts) {
 
   var bounds = new google.maps.LatLngBounds();
 
+  var allUserPaths = [];
   //  for every user
   for (var i = 0; i < userPosts.users.length; i++) {
     var user = userPosts.users[i];
     var posts = user.posts;
 
     // for every post by that user
+    var routeHistory = [];
+
     for (var j = 0; j < posts.length; j++) {
       var post = posts[j];
 
       if (post.latitude != null && post.longitude != null) {
+        var pinIcon = new google.maps.MarkerImage(
+          user.avatar_url,
+          null, /* size is determined at runtime */
+          null, /* origin is 0,0 */
+          null, /* anchor is bottom center of the scaled image */
+          new google.maps.Size(42, 42)
+        );
+
+        // Adding the pin location to a list that will allow a path to be drawn between them, one
+        // for each user
+        var pinLocation = new google.maps.LatLng(post.latitude, post.longitude);
+        routeHistory.push(pinLocation);
+
         var marker = new google.maps.Marker({
-          position: new google.maps.LatLng(post.latitude, post.longitude),
+          position: pinLocation,
           map: map,
           title: user.name,
-          id: post.id
+          id: post.id,
         });
+
+        marker.setIcon(pinIcon);
 
         google.maps.event.addListener(marker, 'click', function(id) {
           return function() {
@@ -71,6 +103,30 @@ function initialiseGMaps(userPosts) {
         bounds.extend(marker.getPosition());
       }
     }
+    allUserPaths.push(routeHistory);
+
+  }
+
+  // making the path between all the pins
+  for (var i = 0; i < allUserPaths.length; i++) {
+      // TODO: CRW - this should be a list of colours - FIX!
+    var colour;
+    if (i == 0) {
+      colour = '#040A0D';
+    } else {
+      colour = '#CFD5D9';
+    }
+    console.log(colour);
+
+    var path = new google.maps.Polyline({
+      path: allUserPaths[i],
+      geodesic: true,
+      strokeColor: colour,
+      strokeOpacity: 1.0,
+      strokeWight: 2
+    });
+
+    path.setMap(map);
   }
 
   map.fitBounds(bounds);
