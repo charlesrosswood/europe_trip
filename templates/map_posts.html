@@ -18,8 +18,8 @@
 		</div>
 
 		<div id="postcard-container" class="color-6 body-font">
-			<img id="left-arrow" class="carousel-arrow left"
-				 src="{{ url_for('static', filename='images/left_arrow_png.png') }}">
+			<!--<img id="left-arrow" class="carousel-arrow left"-->
+				 <!--src="{{ url_for('static', filename='images/left_arrow_png.png') }}">-->
 			{% for post in context.posts %}
 				<div class="postcard border-color-6" data-postcard-id="{{ post.id }}">
 					<div class="postcard-header">
@@ -41,8 +41,8 @@
 					</div>
 				</div>
 			{% endfor %}
-			<img id="right-arrow" class="carousel-arrow right"
-				 src="{{ url_for('static', filename='images/right_arrow_png.png') }}">
+			<!--<img id="right-arrow" class="carousel-arrow right"-->
+				 <!--src="{{ url_for('static', filename='images/right_arrow_png.png') }}">-->
 		</div>
 	{% endblock %}
 
