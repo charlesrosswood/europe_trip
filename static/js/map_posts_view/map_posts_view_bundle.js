@@ -115,7 +115,7 @@ function initialiseGMaps(userPosts) {
     if (i == 0) {
       colour = '#040A0D';
     } else {
-      colour = '#CFD5D9';
+      colour = '#F2867A';
     }
     console.log(colour);
 
