@@ -12,6 +12,15 @@ After settling the dependencies, rerun project_setup.bat and it will install all
 Python and JavaScript dependencies (it does not need a C++ compiler to install the Psycopg2
 dependency).
 
+*SETTING UP THE DATABASE
+*=======================
+From the command line run
+
+ .\create_db.bat
+
+This will drop any previously existing database with the name "europe_trip" and build a new one
+with new tables and insert 2 test users and 2 test posts.
+
 *RUNNING THE DEV SERVER
 *======================
 Each time any JavaScript is changed the JS bundles need to be rebuilt. Browserify is used to handle

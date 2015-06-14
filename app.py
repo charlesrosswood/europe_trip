@@ -13,7 +13,7 @@ import py_modules.error_views as error_views
 
 if platform.system() in ['Windows', 'Darwin']:  # local dev server
     _HOST_ = 'localhost'
-    _DBNAME_ = 'EuropeTrip'
+    _DBNAME_ = 'europe_trip'
     _USER_ = 'postgres'
     _PASSWORD_ = ''
 

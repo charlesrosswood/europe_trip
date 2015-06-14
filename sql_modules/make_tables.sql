@@ -1,3 +1,8 @@
+-- Creating the Database
+CREATE DATABASE europe_trip OWNER postgres;
+
+\c europe_trip
+
 -- Creating the user table
 CREATE TABLE users
 (
