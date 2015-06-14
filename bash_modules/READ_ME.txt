@@ -2,7 +2,7 @@
 *======================
 To setup the project, on the command line (either in the IDE or the *nix terminal) run:
 
- .\project_setup.sh
+ ./project_setup.sh
 
 This will output errors if (1) Python 3.4.3 is not installed, (2) npm (NodeJS package manager) is
 not installed, (3) PostgreSQL binaries could not be found. The output will direct you to the
@@ -19,7 +19,7 @@ JS dependencies and allow JS modules to be imported into other JS modules. Top l
 are called "main.js" under their containing folder, these act as the main JS components for a
 template. To rebuild all the JS modules simply run on the command line:
 
- .\run_dev_server.sh
+ ./run_dev_server.sh
 
 This will bundle all the JS dependencies into <module_name>_bundle.js, where <bundle_name> is the
 containing folder name. These should be imported into the appropriate HTML template using this
