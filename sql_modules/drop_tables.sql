@@ -1,8 +1,4 @@
 DROP TABLE users CASCADE;
 DROP TABLE user_profiles CASCADE;
 
-DROP TABLE photo_uploads CASCADE;
-DROP TABLE geolocations CASCADE;
-DROP TABLE status_entries CASCADE;
-
 DROP TABLE posts CASCADE;

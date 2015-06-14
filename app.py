@@ -13,8 +13,8 @@ import py_modules.error_views as error_views
 
 if platform.system() in ['Windows', 'Darwin']:  # local dev server
     _HOST_ = 'localhost'
-    _DBNAME_ = 'cwod'
-    _USER_ = 'cwod'
+    _DBNAME_ = 'europe_trip'
+    _USER_ = 'postgres'
     _PASSWORD_ = ''
 
     _DEBUG_ = True
@@ -100,4 +100,4 @@ def server_error(e):
 
 # if the app is run directly from command line, hit this function
 if __name__ == '__main__':
-    app.run(debug=_DEBUG_)
+    app.run(debug=_DEBUG_, port=5001)

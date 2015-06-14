@@ -1,0 +1,16 @@
+@echo OFF
+setlocal
+
+echo Dropping previous tables...
+call psql -h localhost -p 5432 -U postgres -d europe_trip -f ../sql_modules/drop_tables.sql
+echo Dropping previous database...
+call psql -h localhost -p 5432 -U postgres -f ../sql_modules/drop_db.sql
+echo Creating new DB and tables...
+call psql -h localhost -p 5432 -U postgres -f ../sql_modules/make_tables.sql
+echo Creating users...
+call psql -h localhost -p 5432 -U postgres -d europe_trip -f ../sql_modules/make_users.sql
+echo Creating posts...
+call psql -h localhost -p 5432 -U postgres -d europe_trip -f ../sql_modules/make_posts.sql
+echo Done
+
+endlocal
