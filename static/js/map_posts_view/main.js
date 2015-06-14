@@ -46,12 +46,12 @@ function initialiseGMaps(userPosts) {
   };
 
   var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-  var input = document.getElementById('places-input');
+//  var input = document.getElementById('places-input');
 
   // set the Google maps control array to have the input element at the "TOP_LEFT" value/position
-  map.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
+//  map.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
 
-  var searchBox = new google.maps.places.SearchBox(input); // turn the HTML input into places search
+//  var searchBox = new google.maps.places.SearchBox(input); // turn the HTML input into places search
 
   var bounds = new google.maps.LatLngBounds();
 
