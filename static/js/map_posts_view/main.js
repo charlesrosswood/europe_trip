@@ -139,13 +139,19 @@ showLoading();
 // Add all listeners down here
 google.maps.event.addDomListener(window, 'load', getNewUserPosts);
 
-postcardContainer.addEventListener('click', function(event) {
+var postcards = document.getElementsByClassName('postcard');
+postcards.addEventListener('click', function(event) {
   var postcardId = event.target.getAttribute('data-postcard-id');
-  if (postcardId !== null) {
-//    TODO: do something, pop up big postcard
-    var that = null;
-  }
+  // 
 });
+
+//postcardContainer.addEventListener('click', function(event) {
+//  var postcardId = event.target.getAttribute('data-postcard-id');
+//  if (postcardId !== null) {
+////    TODO: do something, pop up big postcard
+//    var that = null;
+//  }
+//});
 
 var leftCarouselArrow = document.getElementById('left-arrow');
 leftCarouselArrow.addEventListener('click', function() {
