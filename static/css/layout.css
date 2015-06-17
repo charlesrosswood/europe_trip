@@ -5,13 +5,13 @@ html, body {
   padding: 0;
   font-family: 'Anton', sans-serif;
   overflow: hidden;
+  background-image: url('/static/images/logo780x759.png');
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .content {
   height: calc(100% - 101px);
-  background-image: url('/static/images/logo_780x759.png');
-  background-repeat: no-repeat;
-  background-position: center;
 }
 
 #header-container {
