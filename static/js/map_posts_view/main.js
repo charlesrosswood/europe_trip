@@ -2,6 +2,7 @@ var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
 var showLoading = require('../common_modules/_loading').showLoading;
 var doneLoading = require('../common_modules/_loading').doneLoading;
+var toggleClass = require('../common_modules/_modify_classes').toggleClass;
 
 var chosenPlaces = [];  // TODO: pointless?
 var lookup = [];
@@ -140,10 +141,19 @@ showLoading();
 google.maps.event.addDomListener(window, 'load', getNewUserPosts);
 
 var postcards = document.getElementsByClassName('postcard');
-postcards.addEventListener('click', function(event) {
-  var postcardId = event.target.getAttribute('data-postcard-id');
-  // 
-});
+for (var i = 0; i < postcards.length; i++) {
+  var postcard = postcards[i];
+  postcard.addEventListener('click', function(event) {
+    console.log('here?');
+    var postcardId = event.target.getAttribute('data-postcard-id');
+    // TODO: do something, pop up big postcard
+
+    var bigPostcardNode = document.getElementsByClassName('big-postcard')[0];
+//    toggleClass(bigPostcardNode, 'fade-in');
+    toggleClass(bigPostcardNode, 'active');
+  });
+}
+
 
 //postcardContainer.addEventListener('click', function(event) {
 //  var postcardId = event.target.getAttribute('data-postcard-id');

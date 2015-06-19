@@ -6,12 +6,15 @@
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7oYhGu2nYJUFZOEVh1Z7qdpjlriSzdEc&libraries=places">
         </script>
 
-
 		<link rel='stylesheet' type='text/css'
 			href="{{ url_for('static', filename='css/map_posts.css') }}">
+
+		<link rel='stylesheet' type='text/css'
+			href="{{ url_for('static', filename='css/big_postcard.css') }}">
     {% endblock %}
 
 	{% block content %}
+
 		<div id="map-container">
 			<!--<input id="places-input" class="controls" type="text" placeholder="Search here">-->
 			<div id="map-canvas"></div>
@@ -44,6 +47,9 @@
 			<img id="right-arrow" class="carousel-arrow right"
 				 src="{{ url_for('static', filename='images/right_arrow_png.png') }}">
 		</div>
+		<div class="big-postcard vert-center fade-in horiz-center background-color-1a">Does this
+			work?????</div>
+
 	{% endblock %}
 
     {% block tail_scripts %}
