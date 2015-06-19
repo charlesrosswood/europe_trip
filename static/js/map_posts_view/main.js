@@ -3,10 +3,12 @@ var endPoints = require('../common_modules/_allowed_urls').endPoints;
 var showLoading = require('../common_modules/_loading').showLoading;
 var doneLoading = require('../common_modules/_loading').doneLoading;
 var toggleClass = require('../common_modules/_modify_classes').toggleClass;
+var buildPostcard = require('./_build_postcard').buildPostcard;
 
 var chosenPlaces = [];  // TODO: pointless?
 var lookup = [];
 var markers = [];
+var posts = {};
 
 var postcardContainer = document.getElementById('postcard-container');
 
@@ -17,6 +19,16 @@ function getNewUserPosts() {
   aClient.get(url, function(response, status) {
     if (status == 200) {
       var userPosts = JSON.parse(response);
+
+      // making the posts as a list
+      for (var i = 0; i < userPosts.length; i++) {
+        var user = userPosts[i];
+        var usersPosts = user.posts;
+        for (var j = 0; j < usersPosts.length; j++) {
+          var post = usersPosts[j];
+          posts[post.id] = post;
+        }
+      }
 
       console.log(userPosts);
 
@@ -140,20 +152,37 @@ showLoading();
 // Add all listeners down here
 google.maps.event.addDomListener(window, 'load', getNewUserPosts);
 
+var contentLoading = document.getElementById('content-loading');
+var bigPostcardNode = document.getElementsByClassName('big-postcard')[0];
 var postcards = document.getElementsByClassName('postcard');
 for (var i = 0; i < postcards.length; i++) {
   var postcard = postcards[i];
   postcard.addEventListener('click', function(event) {
     console.log('here?');
-    var postcardId = event.target.getAttribute('data-postcard-id');
+    var postcardId = parseInt(event.target.getAttribute('data-postcard-id'));
     // TODO: do something, pop up big postcard
 
-    var bigPostcardNode = document.getElementsByClassName('big-postcard')[0];
-//    toggleClass(bigPostcardNode, 'fade-in');
+    toggleClass(bigPostcardNode, 'fade-in');
     toggleClass(bigPostcardNode, 'active');
+
+    // construct the post card to show
+    var post = posts[postcardId];
+    buildPostcard(bigPostcardNode, post);
+
+    // use this line if you want to kill the distracting background
+    toggleClass(contentLoading, 'fade-in');
+    toggleClass(contentLoading, 'loading-done');
   });
 }
 
+var closeIcon = document.getElementsByClassName('close-icon')[0];
+closeIcon.addEventListener('click', function() {
+  toggleClass(bigPostcardNode, 'active');
+  toggleClass(bigPostcardNode, 'fade-in');
+
+  toggleClass(contentLoading, 'loading-done');
+  toggleClass(contentLoading, 'fade-in');
+});
 
 //postcardContainer.addEventListener('click', function(event) {
 //  var postcardId = event.target.getAttribute('data-postcard-id');
