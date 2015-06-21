@@ -12,10 +12,13 @@ import py_modules.views as views
 import py_modules.error_views as error_views
 
 if platform.system() in ['Windows', 'Darwin']:  # local dev server
+    if platform.system() == 'Windows':
+        _PASSWORD_ = 'rinhio616'
+    else:
+        _PASSWORD_ = ''
     _HOST_ = 'localhost'
     _DBNAME_ = 'europe_trip'
     _USER_ = 'postgres'
-    _PASSWORD_ = ''
 
     _DEBUG_ = True
 else:  # heroku

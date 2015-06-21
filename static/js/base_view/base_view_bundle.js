@@ -37,7 +37,8 @@ var addClass = function(node, className) {
 
   // chack the class isn't on the node already
   if (!hasClass(node, className)) {
-    node.className = nodeClassNames.join(' ').concat(' ', className);
+    var newClassNames = nodeClassNames.join(' ').concat(' ', className);
+    node.className = newClassNames.trim();
   }
 
   return node;
@@ -53,7 +54,8 @@ var removeClass = function(node, className) {
     }
   }
 
-  node.className = newClasses.join(' ');
+  var newClassNames = newClasses.join(' ');
+  node.className = newClassNames.trim();
 
   return node;
 };
@@ -71,10 +73,17 @@ var toggleClass = function(node, className) {
   return node;
 };
 
+var findAncestor = function (el, cls) {
+  while (!el.classList.contains(cls)) {
+    el = el.parentElement;
+  };
+  return el;
+}
 
 // Export the HttpClient module
 exports.hasClass = hasClass;
 exports.addClass = addClass;
 exports.removeClass = removeClass;
 exports.toggleClass = toggleClass;
+exports.findAncestor = findAncestor;
 },{}]},{},[1]);

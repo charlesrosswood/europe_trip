@@ -6,12 +6,15 @@
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7oYhGu2nYJUFZOEVh1Z7qdpjlriSzdEc&libraries=places">
         </script>
 
-
 		<link rel='stylesheet' type='text/css'
 			href="{{ url_for('static', filename='css/map_posts.css') }}">
+
+		<link rel='stylesheet' type='text/css'
+			href="{{ url_for('static', filename='css/big_postcard.css') }}">
     {% endblock %}
 
 	{% block content %}
+
 		<div id="map-container">
 			<!--<input id="places-input" class="controls" type="text" placeholder="Search here">-->
 			<div id="map-canvas"></div>
@@ -34,8 +37,9 @@
 					<div class="status-text">
 						{{ post.status_entry }}
 					</div><br/>
-					<div class="post-photo">
+					<div class="post-photo-filmstrip">
 						{% if post.image_url %}
+						<!-- TODO: { % for image_url in post.image_urls % }-->
 							<img src="{{ post.image_url }}">
 						{% endif %}
 					</div>
@@ -44,6 +48,12 @@
 			<!--<img id="right-arrow" class="carousel-arrow right"-->
 				 <!--src="{{ url_for('static', filename='images/right_arrow_png.png') }}">-->
 		</div>
+
+		<!-- The container for the chosen postcard -->
+		<div class="big-postcard background-color-1a">
+			<img class="close-icon" src="{{ url_for('static', filename='images/close_icon.png') }}">
+		</div>
+
 	{% endblock %}
 
     {% block tail_scripts %}
