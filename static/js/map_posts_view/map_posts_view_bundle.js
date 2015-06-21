@@ -534,12 +534,12 @@ function buildMiniMap(post) {
 
   // making the marker
 
-//  var marker = new google.maps.Marker({
-//    position: postLocation,
-//    map: map2,
-////    title: user.name,
-//    id: post.id,
-//  });
+  var marker = new google.maps.Marker({
+    position: postLocation,
+    map: map2,
+//    title: user.name,
+    id: post.id,
+  });
 
   google.maps.event.trigger(map2, "resize");
   return miniMapContainer;
