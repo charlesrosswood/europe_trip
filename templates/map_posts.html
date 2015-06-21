@@ -21,8 +21,8 @@
 		</div>
 
 		<div id="postcard-container" class="color-6 body-font">
-			<img id="left-arrow" class="carousel-arrow left"
-				 src="{{ url_for('static', filename='images/left_arrow_png.png') }}">
+			<!--<img id="left-arrow" class="carousel-arrow left"-->
+				 <!--src="{{ url_for('static', filename='images/left_arrow_png.png') }}">-->
 			{% for post in context.posts %}
 				<div class="postcard border-color-6" data-postcard-id="{{ post.id }}">
 					<div class="postcard-header">
@@ -37,20 +37,21 @@
 					<div class="status-text">
 						{{ post.status_entry }}
 					</div><br/>
-					<div class="post-photo">
+					<div class="post-photo-filmstrip">
 						{% if post.image_url %}
+						<!-- TODO: { % for image_url in post.image_urls % }-->
 							<img src="{{ post.image_url }}">
 						{% endif %}
 					</div>
 				</div>
 			{% endfor %}
-			<img id="right-arrow" class="carousel-arrow right"
-				 src="{{ url_for('static', filename='images/right_arrow_png.png') }}">
+			<!--<img id="right-arrow" class="carousel-arrow right"-->
+				 <!--src="{{ url_for('static', filename='images/right_arrow_png.png') }}">-->
 		</div>
+
+		<!-- The container for the chosen postcard -->
 		<div class="big-postcard background-color-1a">
 			<img class="close-icon" src="{{ url_for('static', filename='images/close_icon.png') }}">
-				Does this work?????
-
 		</div>
 
 	{% endblock %}

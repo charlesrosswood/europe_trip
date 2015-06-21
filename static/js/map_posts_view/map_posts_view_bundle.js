@@ -4,6 +4,7 @@ var endPoints = require('../common_modules/_allowed_urls').endPoints;
 var showLoading = require('../common_modules/_loading').showLoading;
 var doneLoading = require('../common_modules/_loading').doneLoading;
 var toggleClass = require('../common_modules/_modify_classes').toggleClass;
+var findAncestor = require('../common_modules/_modify_classes').findAncestor;
 var buildPostcard = require('./_build_postcard').buildPostcard;
 
 var chosenPlaces = [];  // TODO: pointless?
@@ -20,18 +21,15 @@ function getNewUserPosts() {
   aClient.get(url, function(response, status) {
     if (status == 200) {
       var userPosts = JSON.parse(response);
-
       // making the posts as a list
-      for (var i = 0; i < userPosts.length; i++) {
-        var user = userPosts[i];
+      for (var i = 0; i < userPosts.users.length; i++) {
+        var user = userPosts.users[i];
         var usersPosts = user.posts;
         for (var j = 0; j < usersPosts.length; j++) {
           var post = usersPosts[j];
           posts[post.id] = post;
         }
       }
-
-      console.log(userPosts);
 
       initialiseGMaps(userPosts);
     } else {
@@ -60,26 +58,19 @@ function initialiseGMaps(userPosts) {
   };
 
   var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-//  var input = document.getElementById('places-input');
-
-  // set the Google maps control array to have the input element at the "TOP_LEFT" value/position
-//  map.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
-
-//  var searchBox = new google.maps.places.SearchBox(input); // turn the HTML input into places search
-
   var bounds = new google.maps.LatLngBounds();
 
   var allUserPaths = [];
+
   //  for every user
   for (var i = 0; i < userPosts.users.length; i++) {
     var user = userPosts.users[i];
-    var posts = user.posts;
 
     // for every post by that user
     var routeHistory = [];
 
-    for (var j = 0; j < posts.length; j++) {
-      var post = posts[j];
+    for (var j = 0; j < user.posts.length; j++) {
+      var post = user.posts[j];
 
       if (post.latitude != null && post.longitude != null) {
         var pinIcon = new google.maps.MarkerImage(
@@ -107,10 +98,14 @@ function initialiseGMaps(userPosts) {
         google.maps.event.addListener(marker, 'click', function(id) {
           return function() {
             console.log('[data-postcard-id="' + id + '"]');
-            var postcardNode = document.querySelectorAll('[data-postcard-id="' + id + '"]')[0];
-            var postcardBounds = postcardNode.getBoundingClientRect();
-            console.log(postcardBounds.left, postcardContainer.scrollLeft);
-            postcardContainer.scrollLeft = postcardBounds.left;
+            toggleClass(bigPostcardNode, 'fade-in');
+            toggleClass(bigPostcardNode, 'active');
+            var post = posts[id];
+            buildPostcard(bigPostcardNode, post);
+//            var postcardNode = document.querySelectorAll('[data-postcard-id="' + id + '"]')[0];
+//            var postcardBounds = postcardNode.getBoundingClientRect();
+//            console.log(postcardBounds.left, postcardContainer.scrollLeft);
+//            postcardContainer.scrollLeft = postcardBounds.left;
           }
         }(marker.id));
         // to bind the map to the markers
@@ -130,7 +125,6 @@ function initialiseGMaps(userPosts) {
     } else {
       colour = '#F2867A';
     }
-    console.log(colour);
 
     var path = new google.maps.Polyline({
       path: allUserPaths[i],
@@ -156,11 +150,13 @@ google.maps.event.addDomListener(window, 'load', getNewUserPosts);
 var contentLoading = document.getElementById('content-loading');
 var bigPostcardNode = document.getElementsByClassName('big-postcard')[0];
 var postcards = document.getElementsByClassName('postcard');
+
 for (var i = 0; i < postcards.length; i++) {
   var postcard = postcards[i];
   postcard.addEventListener('click', function(event) {
-    console.log('here?');
-    var postcardId = parseInt(event.target.getAttribute('data-postcard-id'));
+    var postcardNode = findAncestor(event.target, 'postcard');
+
+    var postcardId = parseInt(postcardNode.getAttribute('data-postcard-id'));
     // TODO: do something, pop up big postcard
 
     toggleClass(bigPostcardNode, 'fade-in');
@@ -171,8 +167,8 @@ for (var i = 0; i < postcards.length; i++) {
     buildPostcard(bigPostcardNode, post);
 
     // use this line if you want to kill the distracting background
-    toggleClass(contentLoading, 'fade-in');
-    toggleClass(contentLoading, 'loading-done');
+//    toggleClass(contentLoading, 'fade-in');
+//    toggleClass(contentLoading, 'loading-done');
   });
 }
 
@@ -181,8 +177,8 @@ closeIcon.addEventListener('click', function() {
   toggleClass(bigPostcardNode, 'active');
   toggleClass(bigPostcardNode, 'fade-in');
 
-  toggleClass(contentLoading, 'loading-done');
-  toggleClass(contentLoading, 'fade-in');
+//  toggleClass(contentLoading, 'loading-done');
+//  toggleClass(contentLoading, 'fade-in');
 });
 
 //postcardContainer.addEventListener('click', function(event) {
@@ -193,16 +189,21 @@ closeIcon.addEventListener('click', function() {
 //  }
 //});
 
-var leftCarouselArrow = document.getElementById('left-arrow');
-leftCarouselArrow.addEventListener('click', function() {
-  // TODO: CRW - add a translate property to the size of a postcard left
-});
 
-var rightCarouselArrow = document.getElementById('right-arrow');
-rightCarouselArrow.addEventListener('click', function() {
-  // TODO: CRW - add a translate property to the size of a postcard right
-});
 
+
+
+
+//var leftCarouselArrow = document.getElementById('left-arrow');
+//leftCarouselArrow.addEventListener('click', function() {
+//  // TODO: CRW - add a translate property to the size of a postcard left
+//});
+//
+//var rightCarouselArrow = document.getElementById('right-arrow');
+//rightCarouselArrow.addEventListener('click', function() {
+//  // TODO: CRW - add a translate property to the size of a postcard right
+//});
+//
 
 },{"../common_modules/_allowed_urls":2,"../common_modules/_http_client":3,"../common_modules/_loading":4,"../common_modules/_modify_classes":5,"./_build_postcard":6}],2:[function(require,module,exports){
 var endPoints = (function() {
@@ -409,7 +410,8 @@ var addClass = function(node, className) {
 
   // chack the class isn't on the node already
   if (!hasClass(node, className)) {
-    node.className = nodeClassNames.join(' ').concat(' ', className);
+    var newClassNames = nodeClassNames.join(' ').concat(' ', className);
+    node.className = newClassNames.trim();
   }
 
   return node;
@@ -425,7 +427,8 @@ var removeClass = function(node, className) {
     }
   }
 
-  node.className = newClasses.join(' ');
+  var newClassNames = newClasses.join(' ');
+  node.className = newClassNames.trim();
 
   return node;
 };
@@ -443,30 +446,106 @@ var toggleClass = function(node, className) {
   return node;
 };
 
+var findAncestor = function (el, cls) {
+  while (!el.classList.contains(cls)) {
+    el = el.parentElement;
+  };
+  return el;
+}
 
 // Export the HttpClient module
 exports.hasClass = hasClass;
 exports.addClass = addClass;
 exports.removeClass = removeClass;
 exports.toggleClass = toggleClass;
+exports.findAncestor = findAncestor;
 },{}],6:[function(require,module,exports){
+var addClass = require('../common_modules/_modify_classes').addClass;
+
 var buildPostcard = function(bigPostcardNode, post) {
-//  while (bigPostcardNode.firstChild) {
-//    console.log(bigPostcardNode.firstChild.className);
-//    bigPostcardNode.removeChild(bigPostcardNode.firstChild);
-//  }
+  var nodesToDelete = [];
+  // remove all the previous children nodes
+  for (var i = 0; i < bigPostcardNode.children.length; i++) {
+    var childNode = bigPostcardNode.children[i];
+    if (!childNode.classList.contains('close-icon')) {
+      nodesToDelete.push(childNode);
+    }
+  }
 
-  // create all the nodes for the postcard
+  for (var i = 0; i < nodesToDelete.length; i++) {
+    var childNode = nodesToDelete[i];
+    bigPostcardNode.removeChild(childNode);
+  }
+
+  // create all the status text node for the postcard
+  var statusDiv = document.createElement('div');
   var statusText = document.createTextNode(post.status_entry);
+  statusDiv.appendChild(statusText);
 
-  var photo = document.createElement('IMG');
-  photo.setAttribute('src', post.image_url);
+  // creating the thumbnail filmstrip
+  var thumbnailStrip = document.createElement('div');
+  addClass(thumbnailStrip, 'thumbnail-filmstrip');
 
-  bigPostcardNode.appendChild(statusText);
-  bigPostcardNode.appendChild(photo);
+  // creating thumbnails
+  var thumbnails = [];
 
+  // TODO: for (var i=0; i < post.image_urls.length; i++)
+  var thumbnail = document.createElement('IMG');
+  thumbnail.setAttribute('src', post.image_url);
+  addClass(thumbnail, 'thumbnail');
+  thumbnails.push(thumbnail);
+
+  // adding all the thumbnails to the filmstrip
+  for (var i = 0 ; i < thumbnails.length; i++) {
+    thumbnailStrip.appendChild(thumbnails[i]);
+  }
+
+  var miniMapContainer = null;
+  if (post.latitude != null && post.longitude != null) {
+    miniMapContainer = buildMiniMap(post);
+  }
+  console.log(post);
+
+  bigPostcardNode.appendChild(statusDiv);
+  if (miniMapContainer) {
+    bigPostcardNode.appendChild(miniMapContainer);
+  }
+  bigPostcardNode.appendChild(thumbnailStrip);
 };
+
+function buildMiniMap(post) {
+  // building the mini-map
+  var miniMapContainer = document.createElement('div');
+  miniMapContainer.setAttribute('id', 'minimap-container');
+
+  var miniMap = document.createElement('div');
+  miniMap.setAttribute('id', 'minimap-canvas');
+
+  miniMapContainer.appendChild(miniMap);
+
+  // building the Google map
+  var postLocation = new google.maps.LatLng(post.latitude, post.longitude);
+  var mapOptions = {
+    center: postLocation,
+    zoom: 5
+  };
+
+  var map2 = new google.maps.Map(miniMap, mapOptions);
+
+  // making the marker
+
+//  var marker = new google.maps.Marker({
+//    position: postLocation,
+//    map: map2,
+////    title: user.name,
+//    id: post.id,
+//  });
+
+  google.maps.event.trigger(map2, "resize");
+  return miniMapContainer;
+
+}
 
 // export module public APIs here
 exports.buildPostcard = buildPostcard;
-},{}]},{},[1]);
+},{"../common_modules/_modify_classes":5}]},{},[1]);

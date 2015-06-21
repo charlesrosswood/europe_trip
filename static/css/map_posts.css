@@ -41,6 +41,7 @@
 }
 
 .postcard {
+  position: relative;
   border-style: solid;
   border-width: 2px;
   margin: 6px;
@@ -64,8 +65,18 @@
   float: left;
 }
 
-.post-photo > img {
-  width: 200px;
+.post-photo-filmstrip {
+  height: 50%;
+  position: absolute;
+  bottom: 5px;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  width: 100%;
+}
+
+.post-photo-filmstrip > img {
+  height: 100%;
+  margin-right: 5px;
 }
 
 .carousel-arrow {

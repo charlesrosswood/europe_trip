@@ -24,6 +24,30 @@
   width: 50px;
 }
 
+.thumbnail-filmstrip {
+  position: absolute;
+  width: calc(100% - 32px);
+  overflow-x: scroll;
+  overflow-y: hidden;
+  height: 30%;
+  bottom: 16px;
+}
+
+.thumbnail {
+  height: 100%;
+  margin-right: 5px;
+}
+
+#minimap-container {
+  width: 200px;
+  height: 200px;
+}
+
+#minimap-canvas {
+  width: 100%;
+  height: 100%;
+}
+
 @media (max-width: 745px) {
 
   .big-postcard {
