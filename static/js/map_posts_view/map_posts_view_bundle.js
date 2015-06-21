@@ -97,7 +97,6 @@ function initialiseGMaps(userPosts) {
 
         google.maps.event.addListener(marker, 'click', function(id) {
           return function() {
-            console.log('[data-postcard-id="' + id + '"]');
             toggleClass(bigPostcardNode, 'fade-in');
             toggleClass(bigPostcardNode, 'active');
             var post = posts[id];
@@ -490,10 +489,12 @@ var buildPostcard = function(bigPostcardNode, post) {
   var thumbnails = [];
 
   // TODO: for (var i=0; i < post.image_urls.length; i++)
-  var thumbnail = document.createElement('IMG');
-  thumbnail.setAttribute('src', post.image_url);
-  addClass(thumbnail, 'thumbnail');
-  thumbnails.push(thumbnail);
+  if (post.image_url) {
+    var thumbnail = document.createElement('IMG');
+    thumbnail.setAttribute('src', post.image_url);
+    addClass(thumbnail, 'thumbnail');
+    thumbnails.push(thumbnail);
+  }
 
   // adding all the thumbnails to the filmstrip
   for (var i = 0 ; i < thumbnails.length; i++) {
@@ -511,6 +512,9 @@ var buildPostcard = function(bigPostcardNode, post) {
     bigPostcardNode.appendChild(miniMapContainer);
   }
   bigPostcardNode.appendChild(thumbnailStrip);
+
+  // for some reason Google maps cannot handle a div that transitions, so refresh it at the end
+  refreshMiniMap(post);
 };
 
 function buildMiniMap(post) {
@@ -527,24 +531,32 @@ function buildMiniMap(post) {
   var postLocation = new google.maps.LatLng(post.latitude, post.longitude);
   var mapOptions = {
     center: postLocation,
-    zoom: 5
+    zoom: 15
   };
 
-  var map2 = new google.maps.Map(miniMap, mapOptions);
+  miniGoogleMap = new google.maps.Map(miniMap, mapOptions);
 
   // making the marker
 
   var marker = new google.maps.Marker({
     position: postLocation,
-    map: map2,
+    map: miniGoogleMap,
 //    title: user.name,
     id: post.id,
   });
 
-  google.maps.event.trigger(map2, "resize");
   return miniMapContainer;
 
 }
+
+
+function refreshMiniMap(post) {
+  google.maps.event.trigger(miniGoogleMap, 'resize');
+
+  var postLocation = new google.maps.LatLng(post.latitude, post.longitude);
+  miniGoogleMap.setCenter(postLocation);
+}
+
 
 // export module public APIs here
 exports.buildPostcard = buildPostcard;

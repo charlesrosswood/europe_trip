@@ -96,7 +96,6 @@ function initialiseGMaps(userPosts) {
 
         google.maps.event.addListener(marker, 'click', function(id) {
           return function() {
-            console.log('[data-postcard-id="' + id + '"]');
             toggleClass(bigPostcardNode, 'fade-in');
             toggleClass(bigPostcardNode, 'active');
             var post = posts[id];
