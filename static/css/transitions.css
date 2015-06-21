@@ -61,11 +61,11 @@
 .delayed-fade-in {
   opacity: 0;
 
-  animation-name: fadein;
-  -o-animation-name: fadein;
-  -ms-animation-name: fadein;
-  -moz-animation-name: fadein;
-  -webkit-animation-name: fadein;
+  animation-name: delayedfadein;
+  -o-animation-name: delayedfadein;
+  -ms-animation-name: delayedfadein;
+  -moz-animation-name: delayedfadein;
+  -webkit-animation-name: delayedfadein;
 
   animation-duration: 2s;
   -o-animation-duration: 2s;
@@ -85,6 +85,55 @@
   -moz-animation-fill-mode: forwards;
   -webkit-animation-fill-mode: forwards;
   
+}
+
+@keyframes delayedfadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@-o-keyframes delayedfadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@-ms-keyframes delayedfadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@-moz-keyframes delayedfadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@-webkit-keyframes delayedfadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Fading an element in */
+.fade-in {
+  opacity: 0;
+
+  animation-name: fadein;
+  -o-animation-name: fadein;
+  -ms-animation-name: fadein;
+  -moz-animation-name: fadein;
+  -webkit-animation-name: fadein;
+
+  animation-duration: 1s;
+  -o-animation-duration: 1s;
+  -ms-animation-duration: 1s;
+  -moz-animation-duration: 1s;
+  -webkit-animation-duration: 1s;
+
+  animation-fill-mode: forwards;
+  -o-animation-fill-mode: forwards;
+  -ms-animation-fill-mode: forwards;
+  -moz-animation-fill-mode: forwards;
+  -webkit-animation-fill-mode: forwards;
+
 }
 
 @keyframes fadein {
@@ -110,6 +159,55 @@
 @-webkit-keyframes fadein {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* Fading an element out */
+.fade-out {
+  opacity: 1;
+
+  animation-name: fadeout;
+  -o-animation-name: fadeout;
+  -ms-animation-name: fadeout;
+  -moz-animation-name: fadeout;
+  -webkit-animation-name: fadeout;
+
+  animation-duration: 1s;
+  -o-animation-duration: 1s;
+  -ms-animation-duration: 1s;
+  -moz-animation-duration: 1s;
+  -webkit-animation-duration: 1s;
+
+  animation-fill-mode: forwards;
+  -o-animation-fill-mode: forwards;
+  -ms-animation-fill-mode: forwards;
+  -moz-animation-fill-mode: forwards;
+  -webkit-animation-fill-mode: forwards;
+
+}
+
+@keyframes fadeout {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@-o-keyframes fadeout {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@-ms-keyframes fadeout {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@-moz-keyframes fadeout {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@-webkit-keyframes fadeout {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 /* Sliding an element in from the right hand side */
@@ -169,3 +267,21 @@
   from { -webkit-transform: translateX(100%); }
   to { -webkit-transform: translateX(0%); }
 }
+
+/* Sliding in from bottom
+.big-postcard {
+  transition: max-height, 0.5s ease-in-out;
+  -o-transition: max-height, 0.5s ease-in-out;
+  -ms-transition: max-height, 0.5s ease-in-out;
+  -moz-transition: max-height, 0.5s ease-in-out;
+  -webkit-transition: max-height, 0.5s ease-in-out;
+}
+
+.big-postcard.active {
+  transition: max-height, 0.5s ease-in-out;
+  -o-transition: max-height, 0.5s ease-in-out;
+  -ms-transition: max-height, 0.5s ease-in-out;
+  -moz-transition: max-height, 0.5s ease-in-out;
+  -webkit-transition: max-height, 0.5s ease-in-out;
+}
+*/

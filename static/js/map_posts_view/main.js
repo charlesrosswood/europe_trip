@@ -2,10 +2,14 @@ var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
 var showLoading = require('../common_modules/_loading').showLoading;
 var doneLoading = require('../common_modules/_loading').doneLoading;
+var toggleClass = require('../common_modules/_modify_classes').toggleClass;
+var findAncestor = require('../common_modules/_modify_classes').findAncestor;
+var buildPostcard = require('./_build_postcard').buildPostcard;
 
 var chosenPlaces = [];  // TODO: pointless?
 var lookup = [];
 var markers = [];
+var posts = {};
 
 var postcardContainer = document.getElementById('postcard-container');
 
@@ -16,8 +20,15 @@ function getNewUserPosts() {
   aClient.get(url, function(response, status) {
     if (status == 200) {
       var userPosts = JSON.parse(response);
-
-      console.log(userPosts);
+      // making the posts as a list
+      for (var i = 0; i < userPosts.users.length; i++) {
+        var user = userPosts.users[i];
+        var usersPosts = user.posts;
+        for (var j = 0; j < usersPosts.length; j++) {
+          var post = usersPosts[j];
+          posts[post.id] = post;
+        }
+      }
 
       initialiseGMaps(userPosts);
     } else {
@@ -46,26 +57,19 @@ function initialiseGMaps(userPosts) {
   };
 
   var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-//  var input = document.getElementById('places-input');
-
-  // set the Google maps control array to have the input element at the "TOP_LEFT" value/position
-//  map.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
-
-//  var searchBox = new google.maps.places.SearchBox(input); // turn the HTML input into places search
-
   var bounds = new google.maps.LatLngBounds();
 
   var allUserPaths = [];
+
   //  for every user
   for (var i = 0; i < userPosts.users.length; i++) {
     var user = userPosts.users[i];
-    var posts = user.posts;
 
     // for every post by that user
     var routeHistory = [];
 
-    for (var j = 0; j < posts.length; j++) {
-      var post = posts[j];
+    for (var j = 0; j < user.posts.length; j++) {
+      var post = user.posts[j];
 
       if (post.latitude != null && post.longitude != null) {
         var pinIcon = new google.maps.MarkerImage(
@@ -93,10 +97,14 @@ function initialiseGMaps(userPosts) {
         google.maps.event.addListener(marker, 'click', function(id) {
           return function() {
             console.log('[data-postcard-id="' + id + '"]');
-            var postcardNode = document.querySelectorAll('[data-postcard-id="' + id + '"]')[0];
-            var postcardBounds = postcardNode.getBoundingClientRect();
-            console.log(postcardBounds.left, postcardContainer.scrollLeft);
-            postcardContainer.scrollLeft = postcardBounds.left;
+            toggleClass(bigPostcardNode, 'fade-in');
+            toggleClass(bigPostcardNode, 'active');
+            var post = posts[id];
+            buildPostcard(bigPostcardNode, post);
+//            var postcardNode = document.querySelectorAll('[data-postcard-id="' + id + '"]')[0];
+//            var postcardBounds = postcardNode.getBoundingClientRect();
+//            console.log(postcardBounds.left, postcardContainer.scrollLeft);
+//            postcardContainer.scrollLeft = postcardBounds.left;
           }
         }(marker.id));
         // to bind the map to the markers
@@ -116,7 +124,6 @@ function initialiseGMaps(userPosts) {
     } else {
       colour = '#F2867A';
     }
-    console.log(colour);
 
     var path = new google.maps.Polyline({
       path: allUserPaths[i],
@@ -139,21 +146,60 @@ showLoading();
 // Add all listeners down here
 google.maps.event.addDomListener(window, 'load', getNewUserPosts);
 
-postcardContainer.addEventListener('click', function(event) {
-  var postcardId = event.target.getAttribute('data-postcard-id');
-  if (postcardId !== null) {
-//    TODO: do something, pop up big postcard
-    var that = null;
-  }
+var contentLoading = document.getElementById('content-loading');
+var bigPostcardNode = document.getElementsByClassName('big-postcard')[0];
+var postcards = document.getElementsByClassName('postcard');
+
+for (var i = 0; i < postcards.length; i++) {
+  var postcard = postcards[i];
+  postcard.addEventListener('click', function(event) {
+    var postcardNode = findAncestor(event.target, 'postcard');
+
+    var postcardId = parseInt(postcardNode.getAttribute('data-postcard-id'));
+    // TODO: do something, pop up big postcard
+
+    toggleClass(bigPostcardNode, 'fade-in');
+    toggleClass(bigPostcardNode, 'active');
+
+    // construct the post card to show
+    var post = posts[postcardId];
+    buildPostcard(bigPostcardNode, post);
+
+    // use this line if you want to kill the distracting background
+//    toggleClass(contentLoading, 'fade-in');
+//    toggleClass(contentLoading, 'loading-done');
+  });
+}
+
+var closeIcon = document.getElementsByClassName('close-icon')[0];
+closeIcon.addEventListener('click', function() {
+  toggleClass(bigPostcardNode, 'active');
+  toggleClass(bigPostcardNode, 'fade-in');
+
+//  toggleClass(contentLoading, 'loading-done');
+//  toggleClass(contentLoading, 'fade-in');
 });
 
-var leftCarouselArrow = document.getElementById('left-arrow');
-leftCarouselArrow.addEventListener('click', function() {
-  // TODO: CRW - add a translate property to the size of a postcard left
-});
+//postcardContainer.addEventListener('click', function(event) {
+//  var postcardId = event.target.getAttribute('data-postcard-id');
+//  if (postcardId !== null) {
+////    TODO: do something, pop up big postcard
+//    var that = null;
+//  }
+//});
 
-var rightCarouselArrow = document.getElementById('right-arrow');
-rightCarouselArrow.addEventListener('click', function() {
-  // TODO: CRW - add a translate property to the size of a postcard right
-});
 
+
+
+
+
+//var leftCarouselArrow = document.getElementById('left-arrow');
+//leftCarouselArrow.addEventListener('click', function() {
+//  // TODO: CRW - add a translate property to the size of a postcard left
+//});
+//
+//var rightCarouselArrow = document.getElementById('right-arrow');
+//rightCarouselArrow.addEventListener('click', function() {
+//  // TODO: CRW - add a translate property to the size of a postcard right
+//});
+//
