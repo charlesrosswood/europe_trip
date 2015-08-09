@@ -523,6 +523,7 @@ var buildPostcard = function(bigPostcardNode, post) {
       bigImg.setAttribute('id', 'big-pic');
       bigImg.setAttribute('src', event.target.getAttribute('src'));
       addClass(bigImg, 'horiz-center');
+      addClass(bigImg, 'vert-center');
       bigPic.appendChild(bigImg);
     });
 
