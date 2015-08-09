@@ -96,6 +96,10 @@ p {
   width: calc(100% - 5%);
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 @media (max-width: 745px) {
 
   html, body {

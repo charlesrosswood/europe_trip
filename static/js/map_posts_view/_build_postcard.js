@@ -1,22 +1,19 @@
 var addClass = require('../common_modules/_modify_classes').addClass;
+var removeContents = require('../common_modules/_dom_manipulation').removeContents;
 
 var buildPostcard = function(bigPostcardNode, post) {
-  var nodesToDelete = [];
-  // remove all the previous children nodes
-  for (var i = 0; i < bigPostcardNode.children.length; i++) {
-    var childNode = bigPostcardNode.children[i];
-    if (!childNode.classList.contains('close-icon')) {
-      nodesToDelete.push(childNode);
-    }
-  }
+  removeContents(bigPostcardNode);
 
-  for (var i = 0; i < nodesToDelete.length; i++) {
-    var childNode = nodesToDelete[i];
-    bigPostcardNode.removeChild(childNode);
-  }
+  // create the title div to give the status text a lead in
+  var titleDiv = document.createElement('div');
+  addClass(titleDiv, 'title');
+  var title = post.status_entry.substring(0, post.status_entry.lastIndexOf(' ', 25)).concat('...');
+  var titleText = document.createTextNode(title);
+  titleDiv.appendChild(titleText);
 
   // create all the status text node for the postcard
   var statusDiv = document.createElement('div');
+  addClass(statusDiv, 'status');
   var statusText = document.createTextNode(post.status_entry);
   statusDiv.appendChild(statusText);
 
@@ -32,6 +29,21 @@ var buildPostcard = function(bigPostcardNode, post) {
     var thumbnail = document.createElement('IMG');
     thumbnail.setAttribute('src', post.image_url);
     addClass(thumbnail, 'thumbnail');
+    addClass(thumbnail, 'clickable');
+
+    thumbnail.addEventListener('click', function(event) {
+      var bigPic = document.getElementById('big-picture');
+      removeContents(bigPic);
+      addClass(bigPic, 'fade-in');
+      addClass(bigPic, 'active');
+      var bigImg = document.createElement('IMG');
+      bigImg.setAttribute('id', 'big-pic');
+      bigImg.setAttribute('src', event.target.getAttribute('src'));
+      addClass(bigImg, 'horiz-center');
+      addClass(bigImg, 'vert-center');
+      bigPic.appendChild(bigImg);
+    });
+
     thumbnails.push(thumbnail);
   }
 
@@ -44,8 +56,8 @@ var buildPostcard = function(bigPostcardNode, post) {
   if (post.latitude != null && post.longitude != null) {
     miniMapContainer = buildMiniMap(post);
   }
-  console.log(post);
 
+  bigPostcardNode.appendChild(titleDiv);
   bigPostcardNode.appendChild(statusDiv);
   if (miniMapContainer) {
     bigPostcardNode.appendChild(miniMapContainer);

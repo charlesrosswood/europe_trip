@@ -1,4 +1,5 @@
-.big-postcard {
+#big-postcard,
+#big-picture {
   display: none;
   position: absolute;
   top: 25%;
@@ -8,11 +9,19 @@
   padding: 16px;
   outline: 8px solid orange;
   background-color: white;
-  z-index: 3;
   overflow: auto;
 }
 
-.big-postcard.active {
+#big-picture {
+  z-index: 4;
+}
+
+#big-postcard {
+  z-index: 3;
+}
+
+#big-postcard.active,
+#big-picture.active {
   display: block;
 }
 
@@ -25,12 +34,10 @@
 }
 
 .thumbnail-filmstrip {
-  position: absolute;
   width: calc(100% - 32px);
   overflow-x: scroll;
   overflow-y: hidden;
   height: 30%;
-  bottom: 16px;
 }
 
 .thumbnail {
@@ -38,9 +45,27 @@
   margin-right: 5px;
 }
 
+.title {
+  font-family: 'Anton', sans-serif;
+  font-size: 24px;
+  height: 34px;
+}
+
+.status {
+  display: inline-block;
+  width: calc(100% - 200px);
+  vertical-align: top;
+  height: calc(70% - 34px);
+  overflow: scroll;
+  font-family: 'Lato', sans-serif;
+  font-size: 20px;
+}
+
 #minimap-container {
+  display: inline-block;
   width: 200px;
   height: 200px;
+  vertical-align: top;
 }
 
 #minimap-canvas {
@@ -48,9 +73,16 @@
   height: 100%;
 }
 
+#big-pic {
+  max-height: calc(100% - 34px);
+  max-width: calc(100% - 34px);
+  margin-top: 34px;
+}
+
 @media (max-width: 745px) {
 
-  .big-postcard {
+  #big-postcard,
+  #big-picture {
     width: calc(100% - 2 * 16px - 2 * 8px);
     top: 8px;
     left: 8px;

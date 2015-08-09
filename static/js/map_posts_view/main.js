@@ -146,8 +146,9 @@ showLoading();
 google.maps.event.addDomListener(window, 'load', getNewUserPosts);
 
 var contentLoading = document.getElementById('content-loading');
-var bigPostcardNode = document.getElementsByClassName('big-postcard')[0];
+var bigPostcardNode = document.getElementById('big-postcard');
 var postcards = document.getElementsByClassName('postcard');
+var bigPictureNode = document.getElementById('big-picture');
 
 for (var i = 0; i < postcards.length; i++) {
   var postcard = postcards[i];
@@ -170,13 +171,16 @@ for (var i = 0; i < postcards.length; i++) {
   });
 }
 
-var closeIcon = document.getElementsByClassName('close-icon')[0];
-closeIcon.addEventListener('click', function() {
+var postcardCloseIcon = document.getElementById('postcard-close-icon');
+postcardCloseIcon.addEventListener('click', function() {
   toggleClass(bigPostcardNode, 'active');
   toggleClass(bigPostcardNode, 'fade-in');
+});
 
-//  toggleClass(contentLoading, 'loading-done');
-//  toggleClass(contentLoading, 'fade-in');
+var pictureCloseIcon = document.getElementById('picture-close-icon');
+pictureCloseIcon.addEventListener('click', function() {
+  toggleClass(bigPictureNode, 'active');
+  toggleClass(bigPictureNode, 'fade-in');
 });
 
 //postcardContainer.addEventListener('click', function(event) {

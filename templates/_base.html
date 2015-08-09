@@ -44,7 +44,7 @@
 		<div id="page-top">
 			<div id="header-container" class="color-6 delayed-fade-in">
 				<img id="menu-icon"
-					 class="menu phone"
+					 class="menu phone clickable"
 					 src="{{ url_for('static', filename='images/menu_icon_png.png') }}">
 				<div id="page-title" class="margin-left-5">
 					#europe2015
@@ -57,9 +57,9 @@
 					<!--<div class="menu phone nav-item background-color-2">menu</div>-->
 					<!--&lt;!&ndash; navigation bar goes here&ndash;&gt;-->
 					<div href="{{ url_for('map_posts') }}"
-						 class="nav-item background-color-2 border-color-6">map</div>
+						 class="nav-item background-color-2 border-color-6 clickable">map</div>
 					<div href="{{ url_for('upload') }}"
-						 class="nav-item background-color-2 border-color-6">upload
+						 class="nav-item background-color-2 border-color-6 clickable§">upload
 					</div>
 				<!--</div>-->
 				<!--<div class="phone slide-in-from-right hline background-color-1a"></div>-->
@@ -78,9 +78,9 @@
             {% block content %}{% endblock %}
         </div>
 
+		<script type="text/javascript"
+			src="{{ url_for('static', filename='js/base_view/base_view_bundle.js') }}"></script>
+		{% block tail_scripts %}{% endblock %}
     </body>
-	<script type="text/javascript"
-		src="{{ url_for('static', filename='js/base_view/base_view_bundle.js') }}"></script>
-	{% block tail_scripts %}{% endblock %}
 
 </html>

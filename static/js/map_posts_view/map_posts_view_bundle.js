@@ -147,8 +147,9 @@ showLoading();
 google.maps.event.addDomListener(window, 'load', getNewUserPosts);
 
 var contentLoading = document.getElementById('content-loading');
-var bigPostcardNode = document.getElementsByClassName('big-postcard')[0];
+var bigPostcardNode = document.getElementById('big-postcard');
 var postcards = document.getElementsByClassName('postcard');
+var bigPictureNode = document.getElementById('big-picture');
 
 for (var i = 0; i < postcards.length; i++) {
   var postcard = postcards[i];
@@ -171,13 +172,16 @@ for (var i = 0; i < postcards.length; i++) {
   });
 }
 
-var closeIcon = document.getElementsByClassName('close-icon')[0];
-closeIcon.addEventListener('click', function() {
+var postcardCloseIcon = document.getElementById('postcard-close-icon');
+postcardCloseIcon.addEventListener('click', function() {
   toggleClass(bigPostcardNode, 'active');
   toggleClass(bigPostcardNode, 'fade-in');
+});
 
-//  toggleClass(contentLoading, 'loading-done');
-//  toggleClass(contentLoading, 'fade-in');
+var pictureCloseIcon = document.getElementById('picture-close-icon');
+pictureCloseIcon.addEventListener('click', function() {
+  toggleClass(bigPictureNode, 'active');
+  toggleClass(bigPictureNode, 'fade-in');
 });
 
 //postcardContainer.addEventListener('click', function(event) {
@@ -204,7 +208,7 @@ closeIcon.addEventListener('click', function() {
 //});
 //
 
-},{"../common_modules/_allowed_urls":2,"../common_modules/_http_client":3,"../common_modules/_loading":4,"../common_modules/_modify_classes":5,"./_build_postcard":6}],2:[function(require,module,exports){
+},{"../common_modules/_allowed_urls":2,"../common_modules/_http_client":4,"../common_modules/_loading":5,"../common_modules/_modify_classes":6,"./_build_postcard":7}],2:[function(require,module,exports){
 var endPoints = (function() {
   return {
 
@@ -256,6 +260,24 @@ var endPoints = (function() {
 // Export the endPoints module
 exports.endPoints = endPoints;
 },{}],3:[function(require,module,exports){
+var removeContents = function(node) {
+  var nodesToDelete = [];
+  // remove all the previous children nodes
+  for (var i = 0; i < node.children.length; i++) {
+    var childNode = node.children[i];
+    if (!childNode.classList.contains('close-icon')) {
+      nodesToDelete.push(childNode);
+    }
+  }
+
+  for (var i = 0; i < nodesToDelete.length; i++) {
+    var childNode = nodesToDelete[i];
+    node.removeChild(childNode);
+  }
+}
+
+exports.removeContents = removeContents;
+},{}],4:[function(require,module,exports){
 var HttpClient = function() {
 
   function buildFormData(jsonObj) {
@@ -340,7 +362,7 @@ var HttpClient = function() {
 
 // Export the HttpClient module
 exports.HttpClient = HttpClient;
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var toggleClass = require('../common_modules/_modify_classes').toggleClass;
 var addClass = require('../common_modules/_modify_classes').addClass;
 var removeClass = require('../common_modules/_modify_classes').removeClass;
@@ -392,7 +414,7 @@ exports.toggleLoading = toggleLoading;
 exports.showLoading = showLoading;
 exports.doneLoading = doneLoading;
 exports.checkLoaded = checkLoaded;
-},{"../common_modules/_modify_classes":5}],5:[function(require,module,exports){
+},{"../common_modules/_modify_classes":6}],6:[function(require,module,exports){
 var hasClass = function(node, className) {
   var nodeClassNames = node.className.split(' ');
 
@@ -458,26 +480,23 @@ exports.addClass = addClass;
 exports.removeClass = removeClass;
 exports.toggleClass = toggleClass;
 exports.findAncestor = findAncestor;
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var addClass = require('../common_modules/_modify_classes').addClass;
+var removeContents = require('../common_modules/_dom_manipulation').removeContents;
 
 var buildPostcard = function(bigPostcardNode, post) {
-  var nodesToDelete = [];
-  // remove all the previous children nodes
-  for (var i = 0; i < bigPostcardNode.children.length; i++) {
-    var childNode = bigPostcardNode.children[i];
-    if (!childNode.classList.contains('close-icon')) {
-      nodesToDelete.push(childNode);
-    }
-  }
+  removeContents(bigPostcardNode);
 
-  for (var i = 0; i < nodesToDelete.length; i++) {
-    var childNode = nodesToDelete[i];
-    bigPostcardNode.removeChild(childNode);
-  }
+  // create the title div to give the status text a lead in
+  var titleDiv = document.createElement('div');
+  addClass(titleDiv, 'title');
+  var title = post.status_entry.substring(0, post.status_entry.lastIndexOf(' ', 25)).concat('...');
+  var titleText = document.createTextNode(title);
+  titleDiv.appendChild(titleText);
 
   // create all the status text node for the postcard
   var statusDiv = document.createElement('div');
+  addClass(statusDiv, 'status');
   var statusText = document.createTextNode(post.status_entry);
   statusDiv.appendChild(statusText);
 
@@ -493,6 +512,20 @@ var buildPostcard = function(bigPostcardNode, post) {
     var thumbnail = document.createElement('IMG');
     thumbnail.setAttribute('src', post.image_url);
     addClass(thumbnail, 'thumbnail');
+    addClass(thumbnail, 'clickable');
+
+    thumbnail.addEventListener('click', function(event) {
+      var bigPic = document.getElementById('big-picture');
+      removeContents(bigPic);
+      addClass(bigPic, 'fade-in');
+      addClass(bigPic, 'active');
+      var bigImg = document.createElement('IMG');
+      bigImg.setAttribute('id', 'big-pic');
+      bigImg.setAttribute('src', event.target.getAttribute('src'));
+      addClass(bigImg, 'horiz-center');
+      bigPic.appendChild(bigImg);
+    });
+
     thumbnails.push(thumbnail);
   }
 
@@ -505,8 +538,8 @@ var buildPostcard = function(bigPostcardNode, post) {
   if (post.latitude != null && post.longitude != null) {
     miniMapContainer = buildMiniMap(post);
   }
-  console.log(post);
 
+  bigPostcardNode.appendChild(titleDiv);
   bigPostcardNode.appendChild(statusDiv);
   if (miniMapContainer) {
     bigPostcardNode.appendChild(miniMapContainer);
@@ -560,4 +593,4 @@ function refreshMiniMap(post) {
 
 // export module public APIs here
 exports.buildPostcard = buildPostcard;
-},{"../common_modules/_modify_classes":5}]},{},[1]);
+},{"../common_modules/_dom_manipulation":3,"../common_modules/_modify_classes":6}]},{},[1]);
