@@ -33,7 +33,7 @@
   width: 50px;
 }
 
-.thumbnail-filmstrip {
+#thumbnail-filmstrip {
   width: calc(100% - 32px);
   overflow-x: scroll;
   overflow-y: hidden;
@@ -45,17 +45,25 @@
   margin-right: 5px;
 }
 
-.title {
+#title {
   font-family: 'Anton', sans-serif;
   font-size: 24px;
   height: 34px;
 }
 
-.status {
+#post-date {
+  font-style: oblique;
+  text-align: right;
+  height: 20px;
+  font-family: 'Lato', sans-serif;
+  font-size: 16px;
+}
+
+#status {
   display: inline-block;
   width: calc(100% - 200px);
   vertical-align: top;
-  height: calc(70% - 34px);
+  height: calc(70% - 34px - 20px);
   overflow: scroll;
   font-family: 'Lato', sans-serif;
   font-size: 20px;

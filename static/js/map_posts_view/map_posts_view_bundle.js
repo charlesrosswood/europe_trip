@@ -486,23 +486,31 @@ var removeContents = require('../common_modules/_dom_manipulation').removeConten
 
 var buildPostcard = function(bigPostcardNode, post) {
   removeContents(bigPostcardNode);
+  console.log(post);
+
+  // create a posted time div
+  var dateDiv = document.createElement('div');
+  dateDiv.setAttribute('id', 'post-date');
+  var postDate = new Date(post.post_timestamp).toGMTString();
+  var dateText = document.createTextNode(postDate);
+  dateDiv.appendChild(dateText);
 
   // create the title div to give the status text a lead in
   var titleDiv = document.createElement('div');
-  addClass(titleDiv, 'title');
+  titleDiv.setAttribute('id', 'title');
   var title = post.status_entry.substring(0, post.status_entry.lastIndexOf(' ', 25)).concat('...');
   var titleText = document.createTextNode(title);
   titleDiv.appendChild(titleText);
 
   // create all the status text node for the postcard
   var statusDiv = document.createElement('div');
-  addClass(statusDiv, 'status');
+  statusDiv.setAttribute('id', 'status');
   var statusText = document.createTextNode(post.status_entry);
   statusDiv.appendChild(statusText);
 
   // creating the thumbnail filmstrip
   var thumbnailStrip = document.createElement('div');
-  addClass(thumbnailStrip, 'thumbnail-filmstrip');
+  thumbnailStrip.setAttribute('id', 'thumbnail-filmstrip');
 
   // creating thumbnails
   var thumbnails = [];
@@ -541,6 +549,7 @@ var buildPostcard = function(bigPostcardNode, post) {
   }
 
   bigPostcardNode.appendChild(titleDiv);
+  bigPostcardNode.appendChild(dateDiv);
   bigPostcardNode.appendChild(statusDiv);
   if (miniMapContainer) {
     bigPostcardNode.appendChild(miniMapContainer);
