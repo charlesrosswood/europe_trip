@@ -3,7 +3,6 @@ var removeContents = require('../common_modules/_dom_manipulation').removeConten
 
 var buildPostcard = function(bigPostcardNode, post) {
   removeContents(bigPostcardNode);
-  console.log(post);
 
   // create a posted time div
   var dateDiv = document.createElement('div');
