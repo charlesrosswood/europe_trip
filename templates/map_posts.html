@@ -38,9 +38,10 @@
 						{{ post.status_entry }}
 					</div><br/>
 					<div class="post-photo-filmstrip">
-						{% if post.image_url %}
-						<!-- TODO: { % for image_url in post.image_urls % }-->
-							<img src="{{ post.image_url }}">
+						{% if post.images %}
+							{% for image in post.images %}
+								<img src="{{ image.image_url }}">
+							{% endfor %}
 						{% endif %}
 					</div>
 				</div>

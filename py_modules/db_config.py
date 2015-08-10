@@ -89,7 +89,6 @@ class DatabaseConfig(object):
         else:
             #  necessary to cover off empty list
             where = None
-        print(select_statement)
         cleaned_records = []
         with self.connection.cursor() as db_cursor:
             try:

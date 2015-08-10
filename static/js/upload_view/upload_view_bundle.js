@@ -114,18 +114,15 @@ uploadPost.addEventListener("submit", function() {
               var imgurDeleteHash = imgurResponse.data.deletehash;
 
               var dBodyData = {
-                'set_clauses': [
-                  "image_url='".concat(imgurUrl, "'"),
-                  "image_deletehash='".concat(imgurDeleteHash, "'")
-                ],
-                'where_clauses': ['id='.concat(postId)]
+                columns: ['post_id', 'image_url', 'image_deletehash'] ,
+                values: [[parseInt(postId), imgurUrl, imgurDeleteHash]]
               };
 
               var dClient = new HttpClient();
 
-              dClient.put(endPoints.updateTable('posts').url, dBodyData, function(dResponse,
+              dClient.post(endPoints.writeTable('images').url, dBodyData, function(dResponse,
               dStatus) {
-                if (dStatus == 200) {
+                if (dStatus == 201) {
                   imageSuccess = true;
                   checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
                   console.log('we uploaded and updated images!');
@@ -137,7 +134,7 @@ uploadPost.addEventListener("submit", function() {
               });
             } else {
               imgurSuccess = false;
-              checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
+              doneLoading();
               console.log('failed to upload to Imgur');
               console.log(cResponse, cStatus);
             }
@@ -300,7 +297,7 @@ var HttpClient = function() {
 
     anHttpRequest.open('POST', aUrl);
 
-    var clientId = 'a9cda2e43ea6ba9';
+    var clientId = '98b75d371535f10';
     anHttpRequest.setRequestHeader('Authorization', 'Client-ID ' + clientId)
 
     anHttpRequest.send(fd);
@@ -432,7 +429,7 @@ exports.findAncestor = findAncestor;
 var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
 
-// Allowspicture uplaod to Imgur
+// Allows picture upload to Imgur
 var uploadToImgur = function(ownerId, statusId, geolocationId, timeNowMs) {
   console.log('uploading...');
 
@@ -441,6 +438,8 @@ var uploadToImgur = function(ownerId, statusId, geolocationId, timeNowMs) {
 
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
+
+    console.log('file', file);
 
     var aClient = new HttpClient();
 

@@ -1,7 +1,7 @@
 var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
 
-// Allowspicture uplaod to Imgur
+// Allows picture upload to Imgur
 var uploadToImgur = function(ownerId, statusId, geolocationId, timeNowMs) {
   console.log('uploading...');
 
@@ -10,6 +10,8 @@ var uploadToImgur = function(ownerId, statusId, geolocationId, timeNowMs) {
 
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
+
+    console.log('file', file);
 
     var aClient = new HttpClient();
 

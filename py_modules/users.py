@@ -74,9 +74,18 @@ class User(object):
         users_uploads = {}
 
         where_string = ["user_id='%s'" % (self.user_id)]
-        db_result= db.select_from_table('posts', where=where_string)
-        results = db_result['result']
-        users_uploads['posts'] = sorted(results, key=itemgetter('post_timestamp'), reverse=True)
+
+        db_posts = db.select_from_table('posts', where=where_string)
+        posts = db_posts['result']
+
+        for post in posts:
+            post_id = post.get('id', None)
+            img_where_string = ["post_id='%s'" % post_id]
+            db_images = db.select_from_table('images', where=img_where_string)
+            images = db_images['result']
+            post.setdefault('images', images)
+
+        users_uploads['posts'] = sorted(posts, key=itemgetter('post_timestamp'), reverse=True)
 
         return users_uploads
 

@@ -352,7 +352,7 @@ var HttpClient = function() {
 
     anHttpRequest.open('POST', aUrl);
 
-    var clientId = 'a9cda2e43ea6ba9';
+    var clientId = '98b75d371535f10';
     anHttpRequest.setRequestHeader('Authorization', 'Client-ID ' + clientId)
 
     anHttpRequest.send(fd);
@@ -510,31 +510,35 @@ var buildPostcard = function(bigPostcardNode, post) {
   // creating the thumbnail filmstrip
   var thumbnailStrip = document.createElement('div');
   thumbnailStrip.setAttribute('id', 'thumbnail-filmstrip');
+  var thumbnailWrap = document.createElement('div');
+  thumbnailWrap.setAttribute('id', 'thumbnail-wrap');
 
   // creating thumbnails
   var thumbnails = [];
 
   // TODO: for (var i=0; i < post.image_urls.length; i++)
-  if (post.image_url) {
-    var thumbnail = document.createElement('IMG');
-    thumbnail.setAttribute('src', post.image_url);
-    addClass(thumbnail, 'thumbnail');
-    addClass(thumbnail, 'clickable');
+  if (post.images) {
+    for (var i = 0; i < post.images.length; i++) {
+      var thumbnail = document.createElement('IMG');
+      thumbnail.setAttribute('src', post.images[i].image_url);
+      addClass(thumbnail, 'thumbnail');
+      addClass(thumbnail, 'clickable');
 
-    thumbnail.addEventListener('click', function(event) {
-      var bigPic = document.getElementById('big-picture');
-      removeContents(bigPic);
-      addClass(bigPic, 'fade-in');
-      addClass(bigPic, 'active');
-      var bigImg = document.createElement('IMG');
-      bigImg.setAttribute('id', 'big-pic');
-      bigImg.setAttribute('src', event.target.getAttribute('src'));
-      addClass(bigImg, 'horiz-center');
-      addClass(bigImg, 'vert-center');
-      bigPic.appendChild(bigImg);
-    });
+      thumbnail.addEventListener('click', function(event) {
+        var bigPic = document.getElementById('big-picture');
+        removeContents(bigPic);
+        addClass(bigPic, 'fade-in');
+        addClass(bigPic, 'active');
+        var bigImg = document.createElement('IMG');
+        bigImg.setAttribute('id', 'big-pic');
+        bigImg.setAttribute('src', event.target.getAttribute('src'));
+        addClass(bigImg, 'horiz-center');
+        addClass(bigImg, 'vert-center');
+        bigPic.appendChild(bigImg);
+      });
 
-    thumbnails.push(thumbnail);
+      thumbnails.push(thumbnail);
+    }
   }
 
   // adding all the thumbnails to the filmstrip

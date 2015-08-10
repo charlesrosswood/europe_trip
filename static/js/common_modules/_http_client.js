@@ -72,7 +72,7 @@ var HttpClient = function() {
 
     anHttpRequest.open('POST', aUrl);
 
-    var clientId = 'a9cda2e43ea6ba9';
+    var clientId = '98b75d371535f10';
     anHttpRequest.setRequestHeader('Authorization', 'Client-ID ' + clientId)
 
     anHttpRequest.send(fd);

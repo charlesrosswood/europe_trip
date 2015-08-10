@@ -113,18 +113,15 @@ uploadPost.addEventListener("submit", function() {
               var imgurDeleteHash = imgurResponse.data.deletehash;
 
               var dBodyData = {
-                'set_clauses': [
-                  "image_url='".concat(imgurUrl, "'"),
-                  "image_deletehash='".concat(imgurDeleteHash, "'")
-                ],
-                'where_clauses': ['id='.concat(postId)]
+                columns: ['post_id', 'image_url', 'image_deletehash'] ,
+                values: [[parseInt(postId), imgurUrl, imgurDeleteHash]]
               };
 
               var dClient = new HttpClient();
 
-              dClient.put(endPoints.updateTable('posts').url, dBodyData, function(dResponse,
+              dClient.post(endPoints.writeTable('images').url, dBodyData, function(dResponse,
               dStatus) {
-                if (dStatus == 200) {
+                if (dStatus == 201) {
                   imageSuccess = true;
                   checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
                   console.log('we uploaded and updated images!');
@@ -136,7 +133,7 @@ uploadPost.addEventListener("submit", function() {
               });
             } else {
               imgurSuccess = false;
-              checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
+              doneLoading();
               console.log('failed to upload to Imgur');
               console.log(cResponse, cStatus);
             }

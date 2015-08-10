@@ -1,5 +1,5 @@
 insert into
-  posts (user_id, latitude, longitude, post_timestamp, image_url, image_deletehash, status_entry)
+  posts (user_id, latitude, longitude, post_timestamp, status_entry)
   values
   (2,51.458465700000005,0.0069394,1434286544712,
     'http://i.imgur.com/T1qu21Q.jpg','YwCbb9aISo4vdht','A testing message'),

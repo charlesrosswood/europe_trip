@@ -40,9 +40,15 @@
   height: 30%;
 }
 
+#thumbnail-wrap {
+  height: 100%;
+  width: 999999px;
+}
+
 .thumbnail {
   height: 100%;
   margin-right: 5px;
+  display: inline-block;
 }
 
 #title {

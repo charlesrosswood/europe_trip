@@ -37,12 +37,20 @@ CREATE TABLE posts
   post_timestamp BIGINT CHECK (post_timestamp <> 0) NOT NULL ,
   -- in ms since epoch
 
-  -- image upload info
-  image_url CHARACTER VARYING(200) CHECK (image_url <> ''),
-  image_deletehash  CHARACTER VARYING(200) CHECK (image_deletehash <> ''),
-
   -- a status entry (like a post)
   status_entry CHARACTER VARYING(5000) CHECK (status_entry <> ''),
 
   CONSTRAINT posts_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE images
+(
+  id SERIAL NOT NULL,
+  post_id INTEGER REFERENCES posts NOT NULL,
+
+  -- image upload info
+  image_url CHARACTER VARYING(200) CHECK (image_url <> ''),
+  image_deletehash  CHARACTER VARYING(200) CHECK (image_deletehash <> ''),
+
+  CONSTRAINT images_pkey PRIMARY KEY (id)
 );
