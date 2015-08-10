@@ -1,23 +1,52 @@
-var uploadToImgur = require('./_imgur_upload').uploadToImgur;
-var createImgPreview = require('./_imgur_upload').createImgPreview;
+var uploadPostToServer = require('./_post_upload').uploadPostToServer;
+var createImgPreview = require('./_post_upload').createImgPreview;
 var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
 var showLoading = require('../common_modules/_loading').showLoading;
 var doneLoading = require('../common_modules/_loading').doneLoading;
 var checkLoaded = require('../common_modules/_loading').checkLoaded;
+var hasStorage = require('../common_modules/_storage').hasStorage;
 
 // Add all listeners down here
 var uploadPost = document.getElementById('upload-photo');
-var form = document.getElementById('file-field');
+var savePost = document.getElementById('save-button');
 
-// getting current timestamp with timezone
-
-var timeNow = new Date();
-var timeNowMs = timeNow.getTime()
-
-uploadPost.addEventListener("submit", function() {
-
+// Saving the post to localStorage for offline use
+savePost.addEventListener('click', function() {
   showLoading();
+  var form = document.getElementById('file-field');
+  getPostData(form, savePostToLocalStorage);
+});
+
+// Uploading the post to the server
+uploadPost.addEventListener('submit', function() {
+  showLoading();
+  var form = document.getElementById('file-field');
+  getPostData(form, uploadPostToServer);
+});
+
+function savePostToLocalStorage(params) {
+  if (hasStorage) {
+    if (params.files) {
+      delete params['files'];
+    }
+    var localStorageKey = 'post_'.concat(params.timeNowMs);
+    localStorage.setItem(localStorageKey, JSON.stringify(params));
+    console.log('files', form.files);
+    doneLoading();
+    var noImgsSaved = "I've saved all the data I could. I can't save images, " +
+      "I've saved the names. You'll need to reselect them when you upload later!"
+    alert(noImgsSaved);
+  } else {
+    doneLoading();
+    alert('Could not find local storage for offline storage.');
+  }
+}
+
+function getPostData(form, callBack) {
+  // getting current timestamp with timezone
+  var timeNow = new Date();
+  var timeNowMs = timeNow.getTime()
 
   var lat = null;
   var lng = null;
@@ -29,135 +58,37 @@ uploadPost.addEventListener("submit", function() {
   if (statusText == '') {
     statusText = null;
   }
-
-  var postSuccess = false;
-  var locationSuccess = false;
-  var imgurSuccess = false;
-  var imageSuccess = false;
-
-  /*
-  (A) -- making the initial post --
-  */
-  var aBodyData = {
-    columns: ['user_id', 'post_timestamp', 'status_entry'],
-    values: [[parseInt(userId), timeNowMs, statusText]]
+  var params = {
+    timeNowMs: timeNowMs,
+    lat: lat,
+    lng: lng,
+    userId: userId,
+    statusText: statusText
   };
 
-  var aClient = new HttpClient();
-
-  aClient.post(endPoints.writeTable('posts').url, aBodyData, function(aResponse, aStatus) {
-    if (aStatus == 201) {
-      postSuccess = true;
-      checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
-      console.log('created post!');
-      response = JSON.parse(aResponse);
-      var postId = response.result[0].id;
-
-      /*
-      (B) -- updating with location --
-      */
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-          lat = position.coords.latitude;
-          lng = position.coords.longitude;
-          var bBodyData = {
-            'set_clauses': [
-              'latitude='.concat(lat),
-              'longitude='.concat(lng)
-            ],
-            'where_clauses': ['id='.concat(postId)]
-          };
-
-          console.log(bBodyData);
-
-          var bClient = new HttpClient();
-
-          bClient.put(endPoints.updateTable('posts').url, bBodyData, function(bResponse, bStatus) {
-            if (bStatus == 200) {
-              locationSuccess = true;
-              checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
-              console.log('added location!');
-            } else {
-              locationSuccess = false;
-              alert('failed to add location to post');
-              console.log(bResponse, bStatus);
-            }
-          });
-        });
-      } else {
-        locationSuccess = true;
-        console.log('device does not have geolocation');
-      }
-
-      /*
-      (C) -- updating with pictures --
-      */
-      var test = false;
-      if (form.files.length) {
-        test = true;
-      }
-      console.log(form.files, test);
-
-      if (form.files.length) {
-        for (var i = 0; i < form.files.length; i++) {
-          var file = form.files[i];
-
-          var cClient = new HttpClient();
-
-          cClient.postImgur(file, function(cResponse, cStatus) {
-            if (cStatus == 200) {
-              imgurSuccess = true;
-              checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
-              var imgurResponse = JSON.parse(cResponse);
-              var imgurUrl = imgurResponse.data.link;
-              var imgurDeleteHash = imgurResponse.data.deletehash;
-
-              var dBodyData = {
-                columns: ['post_id', 'image_url', 'image_deletehash'] ,
-                values: [[parseInt(postId), imgurUrl, imgurDeleteHash]]
-              };
-
-              var dClient = new HttpClient();
-
-              dClient.post(endPoints.writeTable('images').url, dBodyData, function(dResponse,
-              dStatus) {
-                if (dStatus == 201) {
-                  imageSuccess = true;
-                  checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
-                  console.log('we uploaded and updated images!');
-                } else {
-                  imageSuccess = false;
-                  alert('failed to add imgur URL to post');
-                  console.log(dResponse, dStatus);
-                }
-              });
-            } else {
-              imgurSuccess = false;
-              doneLoading();
-              console.log('failed to upload to Imgur');
-              console.log(cResponse, cStatus);
-            }
-          });
-
-        }
-
-      } else {
-        imageSuccess = true;
-        imgurSuccess = true;
-        checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
-        console.log('no pictures to upload');
-      }
-
-    } else {
-      postSuccess = false;
-      doneLoading();
-      alert('failed to make post');
-      console.log(aResponse, aStatus);
+  var filenameList = [];
+  if (form.files.length) {
+    for (var i = 0; i < form.files.length; i++) {
+      var file = form.files[i];
+      filenameList.push(file.name);
     }
-  });
+    params.fileNames = filenameList;
+    params.files = form.files;
+  }
 
-});
-
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      lat = position.coords.latitude;
+      lng = position.coords.longitude;
+      params.lat = lat;
+      params.lng = lng;
+      callBack(form, params);
+    });
+  } else {
+    callBack(form, params);
+    console.log('device does not have geolocation');
+  }
+}
 
 var chooseImage = document.getElementById('file-field');
 chooseImage.addEventListener("change", function() {

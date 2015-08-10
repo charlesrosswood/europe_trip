@@ -61,6 +61,10 @@ class TemplateRenderers(object):
 
         return render_template('upload.html', context={'users': all_users}), 200
 
+    @staticmethod
+    def view_saved():
+        return render_template('view_saved.html'), 200
+
 
 class DatabaseApis(DatabaseConfig):
     """

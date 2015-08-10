@@ -1,0 +1,17 @@
+{% extends "_base.html" %}
+	{% block title %}Saved posts{% endblock %}
+
+    {% block head_scripts %}
+        <!--<link rel='stylesheet' type='text/css'-->
+            <!--href="{{ url_for('static', filename='css/view_saved.css') }}">-->
+    {% endblock %}
+
+	{% block content %}
+    <div id="view-saved" class="color-6 delayed-fade-in">
+    </div>
+	{% endblock %}
+
+    {% block tail_scripts %}
+		<script type="text/javascript"
+			src="{{ url_for('static', filename='js/upload_view/view_saved_bundle.js') }}"></script>
+	{% endblock %}

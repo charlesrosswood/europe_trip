@@ -6,31 +6,49 @@ var endPoints = require('../common_modules/_allowed_urls').endPoints;
 var showLoading = require('../common_modules/_loading').showLoading;
 var doneLoading = require('../common_modules/_loading').doneLoading;
 var checkLoaded = require('../common_modules/_loading').checkLoaded;
+var hasStorage = require('../common_modules/_storage').hasStorage;
 
 // Add all listeners down here
 var uploadPost = document.getElementById('upload-photo');
+var savePost = document.getElementById('save-button');
 var form = document.getElementById('file-field');
 
-// getting current timestamp with timezone
-
-var timeNow = new Date();
-var timeNowMs = timeNow.getTime()
-
-uploadPost.addEventListener("submit", function() {
-
+// Saving the post to localStorage for offline use
+savePost.addEventListener('click', function() {
   showLoading();
+  getPostData(savePostToLocalStorage);
+});
 
-  var lat = null;
-  var lng = null;
+// Uploading the post to the server
+uploadPost.addEventListener('submit', function() {
+  showLoading();
+  getPostData(uploadPostData);
+});
 
-  var userId = document.getElementById('user-details').value;
-
-  var statusDiv = document.getElementById('status-text');
-  var statusText = statusDiv.value;
-  if (statusText == '') {
-    statusText = null;
+function savePostToLocalStorage(params) {
+  if (hasStorage) {
+    var filenameList = [];
+    if (form.files.length) {
+      for (var i = 0; i < form.files.length; i++) {
+        var file = form.files[i];
+        filenameList.push(file.name);
+      }
+      params.fileNames = filenameList;
+    }
+    var localStorageKey = 'post_'.concat(params.timeNowMs);
+    localStorage.setItem(localStorageKey, JSON.stringify(params));
+    console.log('files', form.files);
+    doneLoading();
+    var noImgsSaved = "I've saved all the data I could. I can't save images, " +
+      "I've saved the names. You'll need to reselect them when you upload later!"
+    alert(noImgsSaved);
+  } else {
+    doneLoading();
+    alert('Could not find local storage for offline storage.');
   }
+}
 
+function uploadPostToServer(params) {
   var postSuccess = false;
   var locationSuccess = false;
   var imgurSuccess = false;
@@ -41,7 +59,7 @@ uploadPost.addEventListener("submit", function() {
   */
   var aBodyData = {
     columns: ['user_id', 'post_timestamp', 'status_entry'],
-    values: [[parseInt(userId), timeNowMs, statusText]]
+    values: [[parseInt(userId), params.timeNowMs, params.statusText]]
   };
 
   var aClient = new HttpClient();
@@ -57,48 +75,35 @@ uploadPost.addEventListener("submit", function() {
       /*
       (B) -- updating with location --
       */
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-          lat = position.coords.latitude;
-          lng = position.coords.longitude;
-          var bBodyData = {
-            'set_clauses': [
-              'latitude='.concat(lat),
-              'longitude='.concat(lng)
-            ],
-            'where_clauses': ['id='.concat(postId)]
-          };
+      if (params.lat && params.lng) {
+        var bBodyData = {
+          'set_clauses': [
+            'latitude='.concat(params.lat),
+            'longitude='.concat(params.lng)
+          ],
+          'where_clauses': ['id='.concat(postId)]
+        };
 
-          console.log(bBodyData);
+        console.log(bBodyData);
 
-          var bClient = new HttpClient();
+        var bClient = new HttpClient();
 
-          bClient.put(endPoints.updateTable('posts').url, bBodyData, function(bResponse, bStatus) {
-            if (bStatus == 200) {
-              locationSuccess = true;
-              checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
-              console.log('added location!');
-            } else {
-              locationSuccess = false;
-              alert('failed to add location to post');
-              console.log(bResponse, bStatus);
-            }
-          });
+        bClient.put(endPoints.updateTable('posts').url, bBodyData, function(bResponse, bStatus) {
+          if (bStatus == 200) {
+            locationSuccess = true;
+            checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
+            console.log('added location!');
+          } else {
+            locationSuccess = false;
+            alert('failed to add location to post');
+            console.log(bResponse, bStatus);
+          }
         });
-      } else {
-        locationSuccess = true;
-        console.log('device does not have geolocation');
       }
 
       /*
       (C) -- updating with pictures --
       */
-      var test = false;
-      if (form.files.length) {
-        test = true;
-      }
-      console.log(form.files, test);
-
       if (form.files.length) {
         for (var i = 0; i < form.files.length; i++) {
           var file = form.files[i];
@@ -157,8 +162,44 @@ uploadPost.addEventListener("submit", function() {
     }
   });
 
-});
+}
 
+function getPostData(callBack) {
+  // getting current timestamp with timezone
+  var timeNow = new Date();
+  var timeNowMs = timeNow.getTime()
+
+  var lat = null;
+  var lng = null;
+
+  var userId = document.getElementById('user-details').value;
+
+  var statusDiv = document.getElementById('status-text');
+  var statusText = statusDiv.value;
+  if (statusText == '') {
+    statusText = null;
+  }
+  var params = {
+    timeNowMs: timeNowMs,
+    lat: lat,
+    lng: lng,
+    userId: userId,
+    statusText: statusText
+  };
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      lat = position.coords.latitude;
+      lng = position.coords.longitude;
+      params.lat = lat;
+      params.lng = lng;
+      callBack(params);
+    });
+  } else {
+    callBack(params);
+    console.log('device does not have geolocation');
+  }
+}
 
 var chooseImage = document.getElementById('file-field');
 chooseImage.addEventListener("change", function() {
@@ -171,7 +212,7 @@ chooseImage.addEventListener("change", function() {
   }
 });
 
-},{"../common_modules/_allowed_urls":2,"../common_modules/_http_client":3,"../common_modules/_loading":4,"./_imgur_upload":6}],2:[function(require,module,exports){
+},{"../common_modules/_allowed_urls":2,"../common_modules/_http_client":3,"../common_modules/_loading":4,"../common_modules/_storage":6,"./_imgur_upload":7}],2:[function(require,module,exports){
 var endPoints = (function() {
   return {
 
@@ -426,6 +467,20 @@ exports.removeClass = removeClass;
 exports.toggleClass = toggleClass;
 exports.findAncestor = findAncestor;
 },{}],6:[function(require,module,exports){
+// Feature test for storage
+var hasStorage = function() {
+  try {
+    var mod = 'europe2015';
+    localStorage.setItem(mod, mod);
+    localStorage.removeItem();
+    return true;
+  } catch (exception) {
+    return false;
+  }
+};
+
+exports.hasStorage = hasStorage;
+},{}],7:[function(require,module,exports){
 var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
 

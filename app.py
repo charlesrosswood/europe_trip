@@ -47,6 +47,10 @@ def map_posts(*args, **kwargs):
 def upload(*args, **kwargs):
     return views.TemplateRenderers.upload(db)
 
+@app.route('/view-saved', methods=['GET'])#, 'POST'])
+def view_saved(*args, **kwargs):
+    return views.TemplateRenderers.view_saved()
+
 
 # RESTful views that act as APIs
 @app.route('/get-updated-posts', methods=['GET'])
