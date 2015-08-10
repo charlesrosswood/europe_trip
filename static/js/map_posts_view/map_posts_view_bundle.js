@@ -512,6 +512,7 @@ var buildPostcard = function(bigPostcardNode, post) {
   thumbnailStrip.setAttribute('id', 'thumbnail-filmstrip');
   var thumbnailWrap = document.createElement('div');
   thumbnailWrap.setAttribute('id', 'thumbnail-wrap');
+  thumbnailStrip.appendChild(thumbnailWrap);
 
   // creating thumbnails
   var thumbnails = [];
@@ -543,7 +544,7 @@ var buildPostcard = function(bigPostcardNode, post) {
 
   // adding all the thumbnails to the filmstrip
   for (var i = 0 ; i < thumbnails.length; i++) {
-    thumbnailStrip.appendChild(thumbnails[i]);
+    thumbnailWrap.appendChild(thumbnails[i]);
   }
 
   var miniMapContainer = null;
@@ -554,13 +555,13 @@ var buildPostcard = function(bigPostcardNode, post) {
   bigPostcardNode.appendChild(titleDiv);
   bigPostcardNode.appendChild(dateDiv);
   bigPostcardNode.appendChild(statusDiv);
-  if (miniMapContainer) {
-    bigPostcardNode.appendChild(miniMapContainer);
+  if (miniMapContainer.container) {
+    bigPostcardNode.appendChild(miniMapContainer.container);
   }
   bigPostcardNode.appendChild(thumbnailStrip);
 
   // for some reason Google maps cannot handle a div that transitions, so refresh it at the end
-  refreshMiniMap(post);
+  refreshMiniMap(post, miniMapContainer.miniMap);
 };
 
 function buildMiniMap(post) {
@@ -591,18 +592,19 @@ function buildMiniMap(post) {
     id: post.id,
   });
 
-  return miniMapContainer;
+  return {
+    container: miniMapContainer,
+    miniMap: miniGoogleMap
+  };
 
 }
 
-
-function refreshMiniMap(post) {
-  google.maps.event.trigger(miniGoogleMap, 'resize');
+function refreshMiniMap(post, miniMap) {
+  google.maps.event.trigger(miniMap, 'resize');
 
   var postLocation = new google.maps.LatLng(post.latitude, post.longitude);
-  miniGoogleMap.setCenter(postLocation);
+  miniMap.setCenter(postLocation);
 }
-
 
 // export module public APIs here
 exports.buildPostcard = buildPostcard;
