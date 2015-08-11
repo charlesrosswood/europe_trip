@@ -1,105 +1,168 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var uploadPostToServer = require('./_post_upload').uploadPostToServer;
-var createImgPreview = require('./_post_upload').createImgPreview;
-var HttpClient = require('../common_modules/_http_client').HttpClient;
-var endPoints = require('../common_modules/_allowed_urls').endPoints;
-var showLoading = require('../common_modules/_loading').showLoading;
-var doneLoading = require('../common_modules/_loading').doneLoading;
-var checkLoaded = require('../common_modules/_loading').checkLoaded;
+var uploadPostToServer = require('../upload_view/_post_upload').uploadPostToServer;
 var hasStorage = require('../common_modules/_storage').hasStorage;
+var addClass = require('../common_modules/_modify_classes').addClass;
+var createNodeWithContent = require('../common_modules/_dom_manipulation').createNodeWithContent;
 
-// Add all listeners down here
-var uploadPost = document.getElementById('upload-photo');
-var savePost = document.getElementById('save-button');
-
-// Saving the post to localStorage for offline use
-savePost.addEventListener('click', function() {
-  showLoading();
-  var form = document.getElementById('file-field');
-  getPostData(form, savePostToLocalStorage);
-});
-
-// Uploading the post to the server
-uploadPost.addEventListener('submit', function() {
-  showLoading();
-  var form = document.getElementById('file-field');
-  getPostData(form, uploadPostToServer);
-});
-
-function savePostToLocalStorage(params) {
-  console.log('params', params);
-  if (hasStorage) {
-    if (params.files) {
-      delete params['files'];
-    }
-    var localStorageKey = 'post_'.concat(params.postTimestamp);
-    localStorage.setItem(localStorageKey, JSON.stringify(params));
-    doneLoading();
-    var noImgsSaved = "I've saved all the data I could. I can't save images, " +
-      "I've saved the names. You'll need to reselect them when you upload later!"
-    alert(noImgsSaved);
-  } else {
-    doneLoading();
-    alert('Could not find local storage for offline storage.');
+function refreshMiniMaps(miniMapsObj) {
+  for (var i = 0; i < miniMapsObj.length; i++) {
+    var miniMap = miniMapsObj[i].miniMap;
+    var post = miniMapsObj[i].params;
+    google.maps.event.trigger(miniMap, 'resize');
+    var postLocation = new google.maps.LatLng(post.lat, post.lng);
+    miniMap.setCenter(postLocation);
   }
 }
 
-function getPostData(form, callBack) {
-  // getting current timestamp with timezone
-  var timeNow = new Date();
-  var timeNowMs = timeNow.getTime()
-
-  var lat = null;
-  var lng = null;
-
-  var statusDiv = document.getElementById('status-text');
-  var statusText = statusDiv.value;
-  if (statusText == '') {
-    statusText = null;
+function uploadFromLocalStorage () {
+  //TODO: make this upload the data to the server
+  var savedPostsNodes = document.getElementsByClassName('saved-post-container');
+  var numSavedPosts = savedPostsNodes.length;
+  for (var i = 0; i < numSavedPosts; i++) {
+    var savedPost = savedPostsNodes[i];
+    var postKey = savedPost.getAttribute('id');
+    var params = JSON.parse(localStorage.getItem(postKey));
+    var postFiles = document.getElementById(postKey.concat('_files')).files;
+    params.files = postFiles;
+    uploadPostToServer(params);
   }
-  var params = {
-    postTimestamp: timeNowMs,
-    lat: lat,
-    lng: lng,
-    statusText: statusText
+}
+
+function getAllSavedPosts() {
+  var savedPosts = {};
+  if (hasStorage) {
+    for (var key in localStorage) {
+      var isPost = (key.slice(0, 4) == 'post');
+      if (isPost) {
+         savedPosts[key] = JSON.parse(localStorage.getItem(key));
+      }
+    }
+  }
+  return savedPosts;
+}
+
+function buildSavedPostForms() {
+  var viewSavedContainer = document.getElementById('view-saved');
+  var savedPosts = getAllSavedPosts();
+  var miniMaps = [];
+  for (var postKey in savedPosts) {
+    if (savedPosts.hasOwnProperty(postKey)) {
+      var params = savedPosts[postKey];
+      var savedPostNode = buildPostForm(params, postKey);
+      viewSavedContainer.appendChild(savedPostNode.container);
+      miniMaps.push({
+        miniMap: savedPostNode.miniMap,
+        params: params
+      });
+    }
+  }
+  refreshMiniMaps(miniMaps);
+}
+
+function buildPostForm(params, postKey) {
+  // TODO: build a form here! Make sure it fits the form needed in uploadPostToServer!
+  var postContainer = document.createElement('div');
+  postContainer.setAttribute('id', postKey);
+  addClass(postContainer, 'saved-post-container');
+  addClass(postContainer, 'horiz-center');
+
+  var dateStr = new Date(params.postTimestamp).toGMTString();
+  var dateNode = createNodeWithContent('div', dateStr);
+  addClass(dateNode, 'post-date');
+
+  var title = params.statusText.substring(0, params.statusText.lastIndexOf(' ', 25)).concat(
+    '...');
+  var titleNode = createNodeWithContent('div', title);
+  addClass(titleNode, 'post-title');
+
+  var statusTextNode = createNodeWithContent('div', params.statusText);
+  addClass(statusTextNode, 'status-text');
+
+  var miniGoogleMap = buildMiniMap(params);
+  var miniMapNode = miniGoogleMap.container;
+
+  var imgFileNames = params.fileNames.join(', ');
+  var imgFileNamesNode = createNodeWithContent('div', imgFileNames);
+  addClass(imgFileNamesNode, 'filenames');
+
+  var fileUploadNode = document.createElement('input');
+  fileUploadNode.setAttribute('type', 'file');
+  fileUploadNode.setAttribute('name', 'image');
+  fileUploadNode.setAttribute('id', postKey.concat('_files'));
+  fileUploadNode.setAttribute('multiple', 'true');
+
+  var deletePost = document.createElement('input');
+  addClass(deletePost, 'delete-post');
+  deletePost.setAttribute('type', 'button');
+  deletePost.setAttribute('id', postKey.concat('_delete'));
+  deletePost.value = 'Delete'
+
+  postContainer.appendChild(dateNode);
+  postContainer.appendChild(titleNode);
+  postContainer.appendChild(statusTextNode);
+  postContainer.appendChild(miniMapNode);
+  postContainer.appendChild(imgFileNamesNode);
+  postContainer.appendChild(fileUploadNode);
+  postContainer.appendChild(deletePost);
+  return {
+    container: postContainer,
+    miniMap: miniGoogleMap.miniMap
+  };
+}
+
+function buildMiniMap(params) {
+  // building the mini-map
+  var miniMapContainer = document.createElement('div');
+  addClass(miniMapContainer, 'minimap-container');
+
+  var miniMap = document.createElement('div');
+  addClass(miniMap, 'minimap-canvas');
+
+  miniMapContainer.appendChild(miniMap);
+
+  // building the Google map
+  var postLocation = new google.maps.LatLng(params.lat, params.lng);
+  var mapOptions = {
+    center: postLocation,
+    zoom: 15
   };
 
-  var filenameList = [];
-  if (form.files.length) {
-    for (var i = 0; i < form.files.length; i++) {
-      var file = form.files[i];
-      filenameList.push(file.name);
-    }
-    params.fileNames = filenameList;
-    params.files = form.files;
-  }
+  miniGoogleMap = new google.maps.Map(miniMap, mapOptions);
 
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      lat = position.coords.latitude;
-      lng = position.coords.longitude;
-      params.lat = lat;
-      params.lng = lng;
-      callBack(params);
-    });
-  } else {
-    callBack(params);
-    console.log('device does not have geolocation');
-  }
+  // making the marker
+
+  var marker = new google.maps.Marker({
+    position: postLocation,
+    map: miniGoogleMap,
+//    title: user.name,
+    id: new Date(params.postTimestamp).toGMTString(),
+  });
+
+  return {
+    container: miniMapContainer,
+    miniMap: miniGoogleMap
+  };
+
 }
 
-var chooseImage = document.getElementById('file-field');
-chooseImage.addEventListener("change", function() {
-  var form3 = document.getElementById('file-field');
-  var files = form3.files;
+buildSavedPostForms();
 
-  for (var i = 0; i < files.length; i++) {
-    var file = files[i];
-    createImgPreview(file);
-  }
-});
+document.getElementById('upload-button').addEventListener('click', uploadFromLocalStorage);
+var deleteButtons = document.getElementsByClassName('delete-post');
 
-},{"../common_modules/_allowed_urls":2,"../common_modules/_http_client":5,"../common_modules/_loading":6,"../common_modules/_storage":8,"./_post_upload":9}],2:[function(require,module,exports){
+for (var i = 0; i < deleteButtons.length; i++) {
+  var viewSavedContainer = document.getElementById('view-saved');
+
+  var button = deleteButtons[i];
+  button.addEventListener('click', function(event) {
+    var postId = event.target.getAttribute('id');
+    postId = postId.slice(0, postId.indexOf('_delete'));
+    var postContainer = document.getElementById(postId);
+    localStorage.removeItem(postId);
+    viewSavedContainer.removeChild(postContainer);
+  });
+}
+},{"../common_modules/_dom_manipulation":4,"../common_modules/_modify_classes":7,"../common_modules/_storage":8,"../upload_view/_post_upload":9}],2:[function(require,module,exports){
 var endPoints = (function() {
   return {
 

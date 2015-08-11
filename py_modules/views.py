@@ -6,11 +6,13 @@ __author__ = 'cwod'
 from flask import render_template
 from flask import Response
 from flask import url_for
+from flask import abort
 import py_modules.users as users
 from py_modules.db_config import DatabaseConfig
 import simplejson as json
 from operator import itemgetter
 import time
+import hashlib
 
 
 def decode_request(request_obj):
@@ -34,7 +36,6 @@ class TemplateRenderers(object):
     Static class to render templates from views call
 
     """
-
     @staticmethod
     def map_posts(db):
         user_uploads = users.User.get_all_users_uploads(db)
@@ -72,7 +73,7 @@ class DatabaseApis(DatabaseConfig):
     """
     def __init__(self, host, dbname, user='postgres', password='postgres', port=5432):
         super(DatabaseApis, self).__init__(host, dbname, user, password, port)
-
+        self.auth_token = '3d2227fad9db32c754b54aa5b601e6bd9c3262d042e0986450e6f291'
 
     def read(self, request, tablename):
         columns = request.args.get('columns', '').split(',')
@@ -113,23 +114,27 @@ class DatabaseApis(DatabaseConfig):
         # TODO: make sure we return the id of the inserted row
 
         payload = json.loads(decode_request(request))
-        if 'columns' in payload.keys():
-            columns = payload['columns']
+        # test for authorisation
+        if self._is_user_authorised(payload.get('auth_token', '')):
+            if 'columns' in payload.keys():
+                columns = payload['columns']
+            else:
+                columns = None
+            values = payload['values']
+
+            db_response = self.insert_into_table(
+                tablename=tablename,
+                values=values,
+                columns=columns
+            )
+
+            response_object = Response(response=json.dumps(db_response), status=db_response[
+                'status'], mimetype='application/json')
+
+            # response_object.headers['Test'] = 1234567890  # this is how you add headers
+            return response_object
         else:
-            columns = None
-        values = payload['values']
-
-        db_response = self.insert_into_table(
-            tablename=tablename,
-            values=values,
-            columns=columns
-        )
-
-        response_object = Response(response=json.dumps(db_response), status=db_response[
-            'status'], mimetype='application/json')
-
-        # response_object.headers['Test'] = 1234567890  # this is how you add headers
-        return response_object
+            abort(401)
 
     def update(self, request, tablename):
         """
@@ -144,18 +149,21 @@ class DatabaseApis(DatabaseConfig):
         :return:
         """
         payload = json.loads(decode_request(request))
-        if 'where_clauses' in payload.keys():
-            where_clauses = payload['where_clauses']
+        if self._is_user_authorised(payload.get('auth_token', '')):
+            if 'where_clauses' in payload.keys():
+                where_clauses = payload['where_clauses']
+            else:
+                where_clauses = None
+
+            db_response = self.update_table(tablename, payload['set_clauses'],
+                where_clauses=where_clauses)
+
+            response_object = Response(response=json.dumps(db_response), status=db_response[
+                'status'], mimetype='application/json')
+
+            return response_object
         else:
-            where_clauses = None
-
-        db_response = self.update_table(tablename, payload['set_clauses'],
-            where_clauses=where_clauses)
-
-        response_object = Response(response=json.dumps(db_response), status=db_response[
-            'status'], mimetype='application/json')
-
-        return response_object
+            abort(401)
         # return json.dumps(db_response), db_response['status']
 
     def delete(self, request, tablename):
@@ -198,3 +206,33 @@ class DatabaseApis(DatabaseConfig):
             mimetype='application/json')
 
         return response_object
+
+    def _is_user_authorised(self, auth_token):
+        return auth_token == self.auth_token
+
+    def authorise_user(self, request):
+        """
+        Use this to log a user in
+        """
+        payload = json.loads(decode_request(request))
+        username = payload.get('username', '')
+
+        password = payload.get('password', '').encode('utf-8')
+        password_hash = hashlib.sha224(password).hexdigest()
+
+        print(username, password_hash)
+
+        where_clause = ["username='%s'" % str(username), "password_hash='%s'" % str(password_hash)]
+        user = self.select_from_table('users', columns=['id'], where=where_clause)
+
+        print(user)
+
+        if (user['result'] and len(user['result']) == 1):
+            user_id = user['result'][0]['id']
+            response = {
+                'auth_token': self.auth_token,
+                'user_id': user_id
+            }
+            return Response(response=json.dumps(response), status=200, mimetype='application/json')
+        else:
+            abort(401)

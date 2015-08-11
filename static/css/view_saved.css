@@ -1,0 +1,43 @@
+.minimap-container {
+  display: inline-block;
+  width: 100%;
+  height: 200px;
+  vertical-align: top;
+}
+
+.minimap-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.save-container {
+  width: 50%;
+}
+
+.saved-post-container {
+  padding: 6px;
+  width: 100%;
+  font-family: 'Lato', sans-serif;
+  font-size: 16px;
+  margin: 6px;
+  outline: #F2867A solid 1px;
+}
+
+.post-date {
+  text-align: right;
+  font-style: italic;
+}
+
+.post-title {
+  font-style: italic;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+@media (max-width: 745px) {
+
+  .save-container {
+    width: 100%;
+  }
+
+}

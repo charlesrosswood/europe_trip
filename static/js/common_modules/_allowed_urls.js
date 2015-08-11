@@ -42,6 +42,10 @@ var endPoints = (function() {
       };
     },
 
+    getAuthKey: {
+      url: 'authorise',
+      methods: ['POST']
+    },
 
   };
 })();  // Note the closure :)

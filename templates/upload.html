@@ -12,18 +12,6 @@
         <form onSubmit="event.preventDefault()"
               id="upload-photo" name="uploadForm">
 
-            <div id="user-entry" class="form-element">
-                <label>
-                    User
-                </label>
-                <select id="user-details">
-                        <option value="">Choose a user...</option>
-                    {% for user in context.users %}
-                        <option value="{{ user.user_id }}">{{ user.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
             <div id="photo-entry" class="form-element">
                 <label>
                     Photo

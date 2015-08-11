@@ -1,19 +1,32 @@
 var HttpClient = require('../common_modules/_http_client').HttpClient;
 var endPoints = require('../common_modules/_allowed_urls').endPoints;
+var addClass = require('../common_modules/_modify_classes').addClass;
+var removeContents = require('../common_modules/_dom_manipulation').removeContents;
+var showLoading = require('../common_modules/_loading').showLoading;
+var doneLoading = require('../common_modules/_loading').doneLoading;
+var checkLoaded = require('../common_modules/_loading').checkLoaded;
+var fetchUserAuth = require('../common_modules/_auth').fetchUserAuth;
+
+function checkAuthThenUpload(params) {
+  fetchUserAuth(params, uploadPostToServer);
+}
 
 // Allows picture upload to Imgur
-function uploadPostToServer(form, params) {
+function uploadPostToServer(params, userData) {
   var postSuccess = false;
   var locationSuccess = false;
   var imgurSuccess = false;
   var imageSuccess = false;
+
+  console.log(userData);
 
   /*
   (A) -- making the initial post --
   */
   var aBodyData = {
     columns: ['user_id', 'post_timestamp', 'status_entry'],
-    values: [[parseInt(userId), params.timeNowMs, params.statusText]]
+    values: [[parseInt(userData.userId), params.postTimestamp, params.statusText]],
+    auth_token: userData.authToken
   };
 
   var aClient = new HttpClient();
@@ -31,14 +44,13 @@ function uploadPostToServer(form, params) {
       */
       if (params.lat && params.lng) {
         var bBodyData = {
-          'set_clauses': [
+          set_clauses: [
             'latitude='.concat(params.lat),
             'longitude='.concat(params.lng)
           ],
-          'where_clauses': ['id='.concat(postId)]
+          where_clauses: ['id='.concat(postId)],
+          auth_token: userData.authToken
         };
-
-        console.log(bBodyData);
 
         var bClient = new HttpClient();
 
@@ -58,9 +70,9 @@ function uploadPostToServer(form, params) {
       /*
       (C) -- updating with pictures --
       */
-      if (form.files.length) {
-        for (var i = 0; i < form.files.length; i++) {
-          var file = form.files[i];
+      if (params.files) {
+        for (var i = 0; i < params.files.length; i++) {
+          var file = params.files[i];
 
           var cClient = new HttpClient();
 
@@ -74,7 +86,8 @@ function uploadPostToServer(form, params) {
 
               var dBodyData = {
                 columns: ['post_id', 'image_url', 'image_deletehash'] ,
-                values: [[parseInt(postId), imgurUrl, imgurDeleteHash]]
+                values: [[parseInt(postId), imgurUrl, imgurDeleteHash]],
+                auth_token: userData.authToken
               };
 
               var dClient = new HttpClient();
@@ -121,16 +134,17 @@ function uploadPostToServer(form, params) {
 
 // Create the DOM for the iage preview
 var createImgPreview = function(imageFileObject) {
-  var reader = new FileReader();
+  var parentNode = document.getElementById('img-preview');
+  removeContents(parentNode);
 
+  var reader = new FileReader();
   reader.onload = function(e) {
     var imgPrevEle = document.createElement('IMG');
     imgPrevEle.setAttribute('src', e.target.result);
-
-    imgPrevEle.className = 'upload-img-prev';
+    addClass(imgPrevEle, 'upload-img-prev');
+    addClass(imgPrevEle, 'horiz-center');
     imgPrevEle.setAttribute('src', e.target.result);
 
-    var parentNode = document.getElementById('img-preview');
     parentNode.appendChild(imgPrevEle);
   }
 
@@ -139,5 +153,5 @@ var createImgPreview = function(imageFileObject) {
 
 
 // export module public APIs here
-exports.uploadPostToServer = uploadPostToServer;
+exports.uploadPostToServer = checkAuthThenUpload;
 exports.createImgPreview = createImgPreview;

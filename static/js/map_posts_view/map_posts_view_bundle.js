@@ -253,6 +253,10 @@ var endPoints = (function() {
       };
     },
 
+    getAuthKey: {
+      url: 'authorise',
+      methods: ['POST']
+    },
 
   };
 })();  // Note the closure :)
@@ -276,7 +280,58 @@ var removeContents = function(node) {
   }
 }
 
+var createNodeWithContent = function(nodeType, text) {
+  const node = document.createElement(nodeType);
+
+  if (text !== null) {
+    const nodeText = document.createTextNode(text);
+    node.appendChild(nodeText);
+  }
+
+  return node;
+}
+
+var createNodeWithText = function(nodeType, text, label) {
+  // Create a container for the rendered form elements
+  const containerNode = document.createElement('div');
+  class_operations.addClass(containerNode, 'form-element-container');
+
+  // If there's no label, don't render one
+  if (label) {
+    const labelNode = document.createElement('div');
+    class_operations.addClass(labelNode, 'label');
+    const labelText = document.createTextNode(label);
+    labelNode.appendChild(labelText);
+
+    containerNode.appendChild(labelNode);
+  }
+
+  const node = createNodeWithContent(nodeType, text);
+  class_operations.addClass(node, 'form-value');
+
+  // Special for 'general comment' search box node
+  if (nodeType === 'input') {
+    const generalCommentContainer = document.createElement('div');
+    class_operations.addClass(generalCommentContainer, 'general-comment-container');
+
+    generalCommentContainer.appendChild(node);
+    containerNode.appendChild(generalCommentContainer);
+  } else {
+    containerNode.appendChild(node);
+  }
+
+  if (nodeType === 'select' || nodeType === 'input') {
+    return {
+      container: containerNode,
+      innerNode: node
+    };
+  }
+  return containerNode;
+}
+
 exports.removeContents = removeContents;
+exports.createNodeWithContent = createNodeWithContent;
+exports.createNodeWithText = createNodeWithText;
 },{}],4:[function(require,module,exports){
 var HttpClient = function() {
 

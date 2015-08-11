@@ -1,8 +1,15 @@
+#img-preview {
+  overflow: auto;
+  max-height: calc(100% - 49px - 60px - 50px);
+}
+
 .upload-img-prev {
   width: 50%;
+  display: block;
 }
 
 .upload-page {
+  height: 100%;
   font-family: 'Lato', sans-serif;
   font-size: 20px;
 }
@@ -29,9 +36,9 @@ input, textarea, select, button {
 
 @media (max-width: 745px) {
 
+
   .upload-img-prev {
     width: 100%;
-    max-height:
   }
 
   input, textarea, select, button {

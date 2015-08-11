@@ -57,6 +57,10 @@ def view_saved(*args, **kwargs):
 def update_posts():
     return db.get_updated_posts()
 
+@app.route('/authorise', methods=['POST'])
+def auth():
+    return db.authorise_user(request)
+
 # RESTful database methods
 # TODO: Fix for SQL injection
 @app.route('/read/<tablename>', methods=['GET'])
@@ -72,6 +76,7 @@ def read(tablename):
 def write(tablename):
     return db.write(request, tablename)
 
+
 @app.route('/update/<tablename>', methods=['PUT'])
 def update(tablename):
     return db.update(request, tablename)
@@ -84,6 +89,10 @@ def delete(tablename):
 @app.errorhandler(400)
 def forbidden(e):
     return error_views.ErrorRenderers.forbidden(e)
+
+@app.errorhandler(401)
+def unauthorised(e):
+    return error_views.ErrorRenderers.unauthorised(e)
 
 @app.errorhandler(403)
 def bad_request(e):

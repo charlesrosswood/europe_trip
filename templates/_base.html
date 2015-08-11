@@ -56,14 +56,21 @@
 				<!--<div class="delayed-fade-in color-6">-->
 					<!--<div class="menu phone nav-item background-color-2">menu</div>-->
 					<!--&lt;!&ndash; navigation bar goes here&ndash;&gt;-->
-					<div href="{{ url_for('map_posts') }}"
+					<div id="map-nav"
+						 href="{{ url_for('map_posts') }}"
 						 class="nav-item background-color-2 border-color-6 clickable">map</div>
-					<div href="{{ url_for('upload') }}"
+					<div id="create-upload-nav"
+						 href="{{ url_for('upload') }}"
 						 class="nav-item background-color-2 border-color-6 clickable">create upload
 					</div>
-					<div href="{{ url_for('view_saved') }}"
-						 class="nav-item background-color-2 border-color-6 clickable">upload saved
+					<div id="voew-saved-nav"
+						 href="{{ url_for('view_saved') }}"
+						 class="nav-item background-color-2 border-color-6 clickable">view saved
 					</div>
+					<div id="logout"
+						 class="nav-item background-color-2 border-color-6 clickable">logout
+					</div>
+				<!--
 				<!--</div>-->
 				<!--<div class="phone slide-in-from-right hline background-color-1a"></div>-->
 			</div>

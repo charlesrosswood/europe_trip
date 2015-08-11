@@ -1,5 +1,5 @@
 .nav-item {
-  width: calc(33% - 24px - 4px - 2px);
+  width: calc(24.9% - 24px - 4px - 2px);
   margin-left: 12px;
   margin-right: 12px;
   /*float: left;*/
@@ -29,7 +29,7 @@
   }
 
   .nav-pane.active {
-    max-height: 100px;
+    max-height: 400px;
   }
 
   .nav-item {

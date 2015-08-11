@@ -26,13 +26,13 @@ uploadPost.addEventListener('submit', function() {
 });
 
 function savePostToLocalStorage(params) {
+  console.log('params', params);
   if (hasStorage) {
     if (params.files) {
       delete params['files'];
     }
-    var localStorageKey = 'post_'.concat(params.timeNowMs);
+    var localStorageKey = 'post_'.concat(params.postTimestamp);
     localStorage.setItem(localStorageKey, JSON.stringify(params));
-    console.log('files', form.files);
     doneLoading();
     var noImgsSaved = "I've saved all the data I could. I can't save images, " +
       "I've saved the names. You'll need to reselect them when you upload later!"
@@ -51,18 +51,15 @@ function getPostData(form, callBack) {
   var lat = null;
   var lng = null;
 
-  var userId = document.getElementById('user-details').value;
-
   var statusDiv = document.getElementById('status-text');
   var statusText = statusDiv.value;
   if (statusText == '') {
     statusText = null;
   }
   var params = {
-    timeNowMs: timeNowMs,
+    postTimestamp: timeNowMs,
     lat: lat,
     lng: lng,
-    userId: userId,
     statusText: statusText
   };
 
@@ -82,10 +79,10 @@ function getPostData(form, callBack) {
       lng = position.coords.longitude;
       params.lat = lat;
       params.lng = lng;
-      callBack(form, params);
+      callBack(params);
     });
   } else {
-    callBack(form, params);
+    callBack(params);
     console.log('device does not have geolocation');
   }
 }
