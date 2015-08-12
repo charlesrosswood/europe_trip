@@ -66,27 +66,6 @@ function buildPostForm(params, postKey) {
   addClass(postContainer, 'saved-post-container');
   addClass(postContainer, 'horiz-center');
 
-  var dateStr = new Date(params.postTimestamp).toGMTString();
-  var dateNode = createNodeWithContent('div', dateStr);
-  addClass(dateNode, 'post-date');
-
-  var title = params.statusText.substring(0, params.statusText.lastIndexOf(' ', 25)).concat(
-    '...');
-  var titleNode = createNodeWithContent('div', title);
-  addClass(titleNode, 'post-title');
-
-  var statusTextNode = createNodeWithContent('div', params.statusText);
-  addClass(statusTextNode, 'status-text');
-
-  var miniGoogleMap = buildMiniMap(params);
-  var miniMapNode = miniGoogleMap.container;
-
-  if (params.files) {
-    var imgFileNames = params.fileNames.join(', ');
-    var imgFileNamesNode = createNodeWithContent('div', imgFileNames);
-    addClass(imgFileNamesNode, 'filenames');
-  }
-
   var fileUploadNode = document.createElement('input');
   fileUploadNode.setAttribute('type', 'file');
   fileUploadNode.setAttribute('name', 'image');
@@ -99,17 +78,41 @@ function buildPostForm(params, postKey) {
   deletePost.setAttribute('id', postKey.concat('_delete'));
   deletePost.value = 'Delete'
 
-  postContainer.appendChild(dateNode);
-  postContainer.appendChild(titleNode);
-  postContainer.appendChild(statusTextNode);
-  postContainer.appendChild(miniMapNode);
+  if (params.postTimestamp) {
+    var dateStr = new Date(params.postTimestamp).toGMTString();
+    var dateNode = createNodeWithContent('div', dateStr);
+    addClass(dateNode, 'post-date');
+    postContainer.appendChild(dateNode);
+  }
+
+  if (params.statusText) {
+    var title = params.statusText.substring(0, params.statusText.lastIndexOf(' ', 25)).concat(
+      '...');
+    var titleNode = createNodeWithContent('div', title);
+    addClass(titleNode, 'post-title');
+    postContainer.appendChild(titleNode);
+
+    var statusTextNode = createNodeWithContent('div', params.statusText);
+    addClass(statusTextNode, 'status-text');
+    postContainer.appendChild(statusTextNode);
+  }
+
+  if (params.lat && params.lng) {
+    var miniGoogleMap = buildMiniMap(params);
+    var miniMapNode = miniGoogleMap.container;
+    postContainer.appendChild(miniMapNode);
+  }
 
   if (params.files) {
+    var imgFileNames = params.fileNames.join(', ');
+    var imgFileNamesNode = createNodeWithContent('div', imgFileNames);
+    addClass(imgFileNamesNode, 'filenames');
     postContainer.appendChild(imgFileNamesNode);
   }
-  
+
   postContainer.appendChild(fileUploadNode);
   postContainer.appendChild(deletePost);
+
   return {
     container: postContainer,
     miniMap: miniGoogleMap.miniMap
