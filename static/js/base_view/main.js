@@ -40,7 +40,7 @@ document.addEventListener('touchmove',function(e){
 // Uses body because jQuery on events are called off of the element they are
 // added to, so bubbling would not work if we used document instead.
 document.getElementsByTagName('body')[0].addEventListener('touchstart', function(e) {
-  if (findAncestor(e.target, selScrollable) {
+  if (findAncestor(e.target, selScrollable)) {
     if (e.currentTarget.scrollTop === 0) {
       e.currentTarget.scrollTop = 1;
     } else if (e.currentTarget.scrollHeight === e.currentTarget.scrollTop + e.currentTarget.offsetHeight) {
