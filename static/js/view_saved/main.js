@@ -14,7 +14,6 @@ function refreshMiniMaps(miniMapsObj) {
 }
 
 function uploadFromLocalStorage () {
-  //TODO: make this upload the data to the server
   var savedPostsNodes = document.getElementsByClassName('saved-post-container');
   var numSavedPosts = savedPostsNodes.length;
   for (var i = 0; i < numSavedPosts; i++) {
@@ -22,7 +21,11 @@ function uploadFromLocalStorage () {
     var postKey = savedPost.getAttribute('id');
     var params = JSON.parse(localStorage.getItem(postKey));
     var postFiles = document.getElementById(postKey.concat('_files')).files;
+
     params.files = postFiles;
+    params.postKey = postKey;
+    params.callBack = deletePost;
+
     uploadPostToServer(params);
   }
 }
@@ -59,7 +62,6 @@ function buildSavedPostForms() {
 }
 
 function buildPostForm(params, postKey) {
-  // TODO: build a form here! Make sure it fits the form needed in uploadPostToServer!
   var postContainer = document.createElement('div');
   postContainer.setAttribute('id', postKey);
   addClass(postContainer, 'saved-post-container');
@@ -153,20 +155,24 @@ function buildMiniMap(params) {
 
 }
 
+function deletePost(postKey) {
+  var postContainer = document.getElementById(postKey);
+  var viewSavedContainer = document.getElementById('view-saved');
+  localStorage.removeItem(postKey);
+  viewSavedContainer.removeChild(postContainer);
+}
+
 buildSavedPostForms();
 
 document.getElementById('upload-button').addEventListener('click', uploadFromLocalStorage);
 var deleteButtons = document.getElementsByClassName('delete-post');
 
 for (var i = 0; i < deleteButtons.length; i++) {
-  var viewSavedContainer = document.getElementById('view-saved');
 
   var button = deleteButtons[i];
   button.addEventListener('click', function(event) {
-    var postId = event.target.getAttribute('id');
-    postId = postId.slice(0, postId.indexOf('_delete'));
-    var postContainer = document.getElementById(postId);
-    localStorage.removeItem(postId);
-    viewSavedContainer.removeChild(postContainer);
+    var postKey = event.target.getAttribute('id');
+    postKey = postId.slice(0, postId.indexOf('_delete'));
+    deletePost(postKey);
   });
 }

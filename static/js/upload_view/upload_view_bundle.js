@@ -543,14 +543,19 @@ function checkAuthThenUpload(params) {
   fetchUserAuth(params, uploadPostToServer);
 }
 
+function executeCallBack(postSuccess, locationSuccess, imgurSuccess, imageSuccess, params) {
+  if (postSuccess && locationSuccess && imgurSuccess &&
+      imageSuccess && params.postKey && params.callBack) {
+    params.callBack(params.postKey);
+  }
+}
+
 // Allows picture upload to Imgur
 function uploadPostToServer(params, userData) {
   var postSuccess = false;
   var locationSuccess = false;
   var imgurSuccess = false;
   var imageSuccess = false;
-
-  console.log(userData);
 
   /*
   (A) -- making the initial post --
@@ -566,7 +571,8 @@ function uploadPostToServer(params, userData) {
   aClient.post(endPoints.writeTable('posts').url, aBodyData, function(aResponse, aStatus) {
     if (aStatus == 201) {
       postSuccess = true;
-      checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
+      doneLoading();
+      executeCallBack(postSuccess, locationSuccess, imgurSuccess, imageSuccess, params);
       console.log('created post!');
       response = JSON.parse(aResponse);
       var postId = response.result[0].id;
@@ -574,6 +580,7 @@ function uploadPostToServer(params, userData) {
       /*
       (B) -- updating with location --
       */
+      showLoading();
       if (params.lat && params.lng) {
         var bBodyData = {
           set_clauses: [
@@ -589,21 +596,31 @@ function uploadPostToServer(params, userData) {
         bClient.put(endPoints.updateTable('posts').url, bBodyData, function(bResponse, bStatus) {
           if (bStatus == 200) {
             locationSuccess = true;
-            checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
+            doneLoading();
+            executeCallBack(postSuccess, locationSuccess, imgurSuccess, imageSuccess, params);
             console.log('added location!');
           } else {
-            locationSuccess = false;
+            doneLoading();
+            executeCallBack(postSuccess, locationSuccess, imgurSuccess, imageSuccess, params);
             alert('failed to add location to post');
             console.log(bResponse, bStatus);
           }
+        }, function() {
+          doneLoading();
+          executeCallBack(postSuccess, locationSuccess, imgurSuccess, imageSuccess, params);
         });
+      } else {
+        locationSuccess = true;
+        executeCallBack(postSuccess, locationSuccess, imgurSuccess, imageSuccess, params);
+        console.log('no location to upload');
       }
 
       /*
       (C) -- updating with pictures --
       */
-      if (params.files) {
+      if (params.files && (params.files.length > 0)) {
         for (var i = 0; i < params.files.length; i++) {
+          showLoading();
           var file = params.files[i];
 
           var cClient = new HttpClient();
@@ -611,11 +628,13 @@ function uploadPostToServer(params, userData) {
           cClient.postImgur(file, function(cResponse, cStatus) {
             if (cStatus == 200) {
               imgurSuccess = true;
-              checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
+              doneLoading();
+              executeCallBack(postSuccess, locationSuccess, imgurSuccess, imageSuccess, params);
               var imgurResponse = JSON.parse(cResponse);
               var imgurUrl = imgurResponse.data.link;
               var imgurDeleteHash = imgurResponse.data.deletehash;
 
+              showLoading();
               var dBodyData = {
                 columns: ['post_id', 'image_url', 'image_deletehash'] ,
                 values: [[parseInt(postId), imgurUrl, imgurDeleteHash]],
@@ -623,46 +642,53 @@ function uploadPostToServer(params, userData) {
               };
 
               var dClient = new HttpClient();
-
               dClient.post(endPoints.writeTable('images').url, dBodyData, function(dResponse,
               dStatus) {
                 if (dStatus == 201) {
                   imageSuccess = true;
-                  checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
+                  doneLoading();
+                  executeCallBack(postSuccess, locationSuccess, imgurSuccess, imageSuccess, params);
                   console.log('we uploaded and updated images!');
                 } else {
-                  imageSuccess = false;
+                  doneLoading();
+                  executeCallBack(postSuccess, locationSuccess, imgurSuccess, imageSuccess, params);
                   alert('failed to add imgur URL to post');
                   console.log(dResponse, dStatus);
                 }
+              }, function() {
+                doneLoading();
+                executeCallBack(postSuccess, locationSuccess, imgurSuccess, imageSuccess, params);
               });
             } else {
-              imgurSuccess = false;
               doneLoading();
+              executeCallBack(postSuccess, locationSuccess, imgurSuccess, imageSuccess, params);
               console.log('failed to upload to Imgur');
               console.log(cResponse, cStatus);
             }
+          }, function() {
+            executeCallBack(postSuccess, locationSuccess, imgurSuccess, imageSuccess, params);
+            doneLoading();
           });
-
         }
-
       } else {
+        imgurSuccess = true;  // no pics to upload after all
         imageSuccess = true;
-        imgurSuccess = true;
-        checkLoaded(postSuccess, locationSuccess, imgurSuccess, imageSuccess);
+        executeCallBack(postSuccess, locationSuccess, imgurSuccess, imageSuccess, params);
         console.log('no pictures to upload');
       }
 
     } else {
-      postSuccess = false;
       doneLoading();
+      executeCallBack(postSuccess, locationSuccess, imgurSuccess, imageSuccess, params);
       alert('failed to make post');
       console.log(aResponse, aStatus);
     }
+  }, function() {
+    executeCallBack(postSuccess, locationSuccess, imgurSuccess, imageSuccess, params);
+    doneLoading();
   });
 
 }
-
 
 // Create the DOM for the iage preview
 var createImgPreview = function(imageFileObject) {
