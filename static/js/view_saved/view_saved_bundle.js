@@ -173,7 +173,7 @@ for (var i = 0; i < deleteButtons.length; i++) {
   var button = deleteButtons[i];
   button.addEventListener('click', function(event) {
     var postKey = event.target.getAttribute('id');
-    postKey = postId.slice(0, postId.indexOf('_delete'));
+    postKey = postKey.slice(0, postKey.indexOf('_delete'));
     deletePost(postKey);
   });
 }
