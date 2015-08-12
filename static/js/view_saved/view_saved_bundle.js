@@ -81,9 +81,11 @@ function buildPostForm(params, postKey) {
   var miniGoogleMap = buildMiniMap(params);
   var miniMapNode = miniGoogleMap.container;
 
-  var imgFileNames = params.fileNames.join(', ');
-  var imgFileNamesNode = createNodeWithContent('div', imgFileNames);
-  addClass(imgFileNamesNode, 'filenames');
+  if (params.files) {
+    var imgFileNames = params.fileNames.join(', ');
+    var imgFileNamesNode = createNodeWithContent('div', imgFileNames);
+    addClass(imgFileNamesNode, 'filenames');
+  }
 
   var fileUploadNode = document.createElement('input');
   fileUploadNode.setAttribute('type', 'file');
@@ -101,7 +103,11 @@ function buildPostForm(params, postKey) {
   postContainer.appendChild(titleNode);
   postContainer.appendChild(statusTextNode);
   postContainer.appendChild(miniMapNode);
-  postContainer.appendChild(imgFileNamesNode);
+
+  if (params.files) {
+    postContainer.appendChild(imgFileNamesNode);
+  }
+  
   postContainer.appendChild(fileUploadNode);
   postContainer.appendChild(deletePost);
   return {
