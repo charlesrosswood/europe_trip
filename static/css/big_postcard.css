@@ -8,6 +8,7 @@
   height: 50%;
   padding: 16px;
   outline: 8px solid orange;
+  border: 8px solid orange;
   background-color: white;
   overflow: auto;
 }
@@ -105,11 +106,13 @@
   #status {
     display: block;
     width: 100%;
-    height: calc(70% - 34px - 20px - 200px);
+    height: calc(70% - 34px - 20px - 150px);
+    font-size: 15px;
   }
 
   #minimap-container {
     display: block;
+    height: 150px;
     width: 100%;
   }
 }
