@@ -38,6 +38,22 @@
 
   .save-container {
     width: 100%;
+    height: 100%;
+  }
+
+  #view-saved {
+    height: calc(100% - 24px);
+    overflow-y: scroll;
+  }
+
+  .horiz-center {
+    position: static;
+    left: none;
+    transform: none;
+    -o-transform: none;
+    -ms-transform: none;
+    -moz-transform: none;
+    -webkit-transform: none;
   }
 
 }
