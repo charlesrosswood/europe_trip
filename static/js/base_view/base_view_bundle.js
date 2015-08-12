@@ -41,18 +41,20 @@ document.addEventListener('touchmove',function(e){
 // Uses body because jQuery on events are called off of the element they are
 // added to, so bubbling would not work if we used document instead.
 document.getElementsByTagName('body')[0].addEventListener('touchstart', function(e) {
-  if (findAncestor(e.target, selScrollable)) {
-    if (e.currentTarget.scrollTop === 0) {
-      e.currentTarget.scrollTop = 1;
-    } else if (e.currentTarget.scrollHeight === e.currentTarget.scrollTop + e.currentTarget.offsetHeight) {
-      e.currentTarget.scrollTop -= 1;
+  var scrollableDiv = findAncestor(e.target, selScrollable);
+  if (scrollableDiv) {
+    if (scrollableDiv.scrollTop === 0) {
+      scrollableDiv.scrollTop = 1;
+    } else if (scrollableDiv.scrollHeight === scrollableDiv.scrollTop + scrollableDiv.offsetHeight) {
+      scrollableDiv.scrollTop -= 1;
     }
   }
 });
 
 // Stops preventDefault from being called on document if it sees a scrollable div
 document.getElementsByTagName('body')[0].addEventListener('touchmove', function(e) {
-  if (findAncestor(e.target, selScrollable)) {
+  var scrollableDiv = findAncestor(e.target, selScrollable);
+  if (scrollableDiv) {
     e.stopPropagation();
   }
 });
