@@ -1,4 +1,5 @@
 var toggleClass = require('../common_modules/_modify_classes').toggleClass;
+var findAncestor = require('../common_modules/_modify_classes').findAncestor;
 var logoutUser = require('../common_modules/_auth').logoutUser;
 
 // Adding clickable links to all elements under the nav-pane
@@ -38,17 +39,19 @@ document.addEventListener('touchmove',function(e){
 
 // Uses body because jQuery on events are called off of the element they are
 // added to, so bubbling would not work if we used document instead.
-document.getElementsByTagName('body')[0].addEventListener('touchstart', selScrollable,
-  function(e) {
+document.getElementsByTagName('body')[0].addEventListener('touchstart', function(e) {
+  if (findAncestor(e.target, selScrollable) {
     if (e.currentTarget.scrollTop === 0) {
       e.currentTarget.scrollTop = 1;
     } else if (e.currentTarget.scrollHeight === e.currentTarget.scrollTop + e.currentTarget.offsetHeight) {
       e.currentTarget.scrollTop -= 1;
     }
   }
-);
+});
 
 // Stops preventDefault from being called on document if it sees a scrollable div
-document.getElementsByTagName('body')[0].addEventListener('touchmove', selScrollable, function(e) {
-  e.stopPropagation();
+document.getElementsByTagName('body')[0].addEventListener('touchmove', function(e) {
+  if (findAncestor(e.target, selScrollable)) {
+    e.stopPropagation();
+  }
 });
