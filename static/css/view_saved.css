@@ -49,7 +49,7 @@
   .saved-post-container {
     width: calc(100% - 24px);
   }
-  
+
   .saved-post-container.horiz-center {
     position: static;
     left: none;
