@@ -29,35 +29,35 @@ navPane.addEventListener('click', function(event) {
     }
   }
 });
-
-// preventing bounce on mobile scrolling
-var selScrollable = '.scrollable';
-
-// Uses document because document will be topmost level in bubbling
-document.addEventListener('touchmove',function(e){
-  e.preventDefault();
-});
-
-// Uses body because jQuery on events are called off of the element they are
-// added to, so bubbling would not work if we used document instead.
-document.getElementsByTagName('body')[0].addEventListener('touchstart', function(e) {
-  var scrollableDiv = findAncestor(e.target, selScrollable);
-  if (scrollableDiv) {
-    if (scrollableDiv.scrollTop === 0) {
-      scrollableDiv.scrollTop = 1;
-    } else if (scrollableDiv.scrollHeight === scrollableDiv.scrollTop + scrollableDiv.offsetHeight) {
-      scrollableDiv.scrollTop -= 1;
-    }
-  }
-});
-
-// Stops preventDefault from being called on document if it sees a scrollable div
-document.getElementsByTagName('body')[0].addEventListener('touchmove', function(e) {
-  var scrollableDiv = findAncestor(e.target, selScrollable);
-  if (scrollableDiv) {
-    e.stopPropagation();
-  }
-});
+//
+//// preventing bounce on mobile scrolling
+//var selScrollable = '.scrollable';
+//
+//// Uses document because document will be topmost level in bubbling
+//document.addEventListener('touchmove',function(e){
+//  e.preventDefault();
+//});
+//
+//// Uses body because jQuery on events are called off of the element they are
+//// added to, so bubbling would not work if we used document instead.
+//document.getElementsByTagName('body')[0].addEventListener('touchstart', function(e) {
+//  var scrollableDiv = findAncestor(e.target, selScrollable);
+//  if (scrollableDiv) {
+//    if (scrollableDiv.scrollTop === 0) {
+//      scrollableDiv.scrollTop = 1;
+//    } else if (scrollableDiv.scrollHeight === scrollableDiv.scrollTop + scrollableDiv.offsetHeight) {
+//      scrollableDiv.scrollTop -= 1;
+//    }
+//  }
+//});
+//
+//// Stops preventDefault from being called on document if it sees a scrollable div
+//document.getElementsByTagName('body')[0].addEventListener('touchmove', function(e) {
+//  var scrollableDiv = findAncestor(e.target, selScrollable);
+//  if (scrollableDiv) {
+//    e.stopPropagation();
+//  }
+//});
 },{"../common_modules/_auth":3,"../common_modules/_modify_classes":6}],2:[function(require,module,exports){
 var endPoints = (function() {
   return {
