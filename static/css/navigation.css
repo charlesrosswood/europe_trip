@@ -1,4 +1,5 @@
 .nav-item {
+  cursor: pointer;
   width: calc(24.9% - 24px - 4px - 2px);
   margin-left: 12px;
   margin-right: 12px;

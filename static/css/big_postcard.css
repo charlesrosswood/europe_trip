@@ -2,12 +2,11 @@
 #big-picture {
   display: none;
   position: absolute;
-  top: 25%;
-  left: 25%;
-  width: 50%;
-  height: 50%;
+  top: calc(12.5% - 8px);
+  left: calc(12.5% - 8px);
+  width: 75%;
+  height: 75%;
   padding: 16px;
-  outline: 8px solid orange;
   border: 8px solid orange;
   background-color: white;
   overflow: auto;
@@ -98,8 +97,8 @@
   #big-postcard,
   #big-picture {
     width: calc(100% - 2 * 16px - 2 * 8px);
-    top: 8px;
-    left: 8px;
+    top: 0px;
+    left: 0px;
     height: calc(100% - 2 * 16px - 2 * 8px);
   }
 
