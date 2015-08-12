@@ -101,4 +101,14 @@
     left: 8px;
     height: calc(100% - 2 * 16px - 2 * 8px);
   }
+
+  #status {
+    display: block;
+    height: calc(70% - 34px - 20px - 200px);
+  }
+
+  #minimap-container {
+    display: block;
+    width: 100%;
+  }
 }
