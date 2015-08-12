@@ -572,6 +572,10 @@ var toggleClass = function(node, className) {
 
 var findAncestor = function (el, cls) {
   while (!el.classList.contains(cls)) {
+    // If we reach the body node then fail
+    if (el.nodeName.toLowerCase() === 'body') {
+      return null;
+    }
     el = el.parentElement;
   };
   return el;
