@@ -104,6 +104,7 @@
 
   #status {
     display: block;
+    width: 100%;
     height: calc(70% - 34px - 20px - 200px);
   }
 
