@@ -98,6 +98,7 @@ class DatabaseConfig(object):
                 column_names = [desc[0] for desc in db_cursor.description]
 
                 records = db_cursor.fetchall()
+                print(records)
 
                 # this will be slow
                 for record in records:
