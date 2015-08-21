@@ -39,6 +39,8 @@ class TemplateRenderers(object):
     @staticmethod
     def map_posts(db):
         user_uploads = users.User.get_all_users_uploads(db)
+        print('all uploads:::', user_uploads)
+
         user_dict = {}
         all_posts = []
 
