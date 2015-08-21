@@ -36,6 +36,7 @@ db = DatabaseApis(host=_HOST_, dbname=_DBNAME_, user=_USER_,
     password=_PASSWORD_)
 
 app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False
 
 
 # Views that render templates
