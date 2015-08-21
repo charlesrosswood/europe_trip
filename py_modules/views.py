@@ -39,7 +39,6 @@ class TemplateRenderers(object):
     @staticmethod
     def map_posts(db):
         user_uploads = users.User.get_all_users_uploads(db)
-        print('all uploads:::', user_uploads)
 
         user_dict = {}
         all_posts = []
@@ -55,6 +54,8 @@ class TemplateRenderers(object):
             human_readable_date = time.strftime('%d-%m-%Y %H:%M', time.gmtime(timestamp_ms /
                                                                               1000.0))
             post['date'] = human_readable_date
+        print('all posts:::', all_posts)
+
         return render_template('map_posts.html', context={'posts': all_posts, 'users':
             user_dict}), 200
 
