@@ -102,7 +102,10 @@ class DatabaseConfig(object):
                 for record in records:
                     record_dict = {}
                     for i in range(len(column_names)):
-                        record_dict[column_names[i]] = record[i].decode('utf-8')
+                        try:
+                            record_dict[column_names[i]] = record[i].decode('utf-8')
+                        except (AttributeError, ValueError):
+                            record_dict[column_names[i]] = record[i]
                     cleaned_records.append(record_dict)
 
                 db_cursor.close()
