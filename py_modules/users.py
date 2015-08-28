@@ -78,8 +78,6 @@ class User(object):
         db_posts = db.select_from_table('posts', where=where_string)
         posts = db_posts['result']
 
-        print('posts', posts)
-
         for post in posts:
             post_id = post.get('id', None)
             img_where_string = ["post_id='%s'" % post_id]

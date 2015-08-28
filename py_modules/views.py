@@ -54,7 +54,6 @@ class TemplateRenderers(object):
             human_readable_date = time.strftime('%d-%m-%Y %H:%M', time.gmtime(timestamp_ms /
                                                                               1000.0))
             post['date'] = human_readable_date
-        print('all posts:::', all_posts)
 
         return render_template('map_posts.html', context={'posts': all_posts, 'users':
             user_dict}), 200
@@ -205,7 +204,6 @@ class DatabaseApis(DatabaseConfig):
             'users': user_uploads
         }
 
-        print(context)
         response_object = Response(response=json.dumps(context), status=200,
             mimetype='application/json')
 
@@ -224,12 +222,8 @@ class DatabaseApis(DatabaseConfig):
         password = payload.get('password', '').encode('utf-8')
         password_hash = hashlib.sha224(password).hexdigest()
 
-        print(username, password_hash)
-
         where_clause = ["username='%s'" % str(username), "password_hash='%s'" % str(password_hash)]
         user = self.select_from_table('users', columns=['id'], where=where_clause)
-
-        print(user)
 
         if (user['result'] and len(user['result']) == 1):
             user_id = user['result'][0]['id']

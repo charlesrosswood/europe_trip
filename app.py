@@ -17,7 +17,7 @@ app.config['JSON_AS_ASCII'] = False
 
 if platform.system() in ['Windows', 'Darwin']:  # local dev server
     if platform.system() == 'Windows':
-        _PASSWORD_ = 'rinhio616'
+        _PASSWORD_ = None
     else:
         _PASSWORD_ = ''
     _HOST_ = 'localhost'

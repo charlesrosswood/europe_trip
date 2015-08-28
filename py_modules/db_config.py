@@ -102,6 +102,7 @@ class DatabaseConfig(object):
                 for record in records:
                     record_dict = {}
                     for i in range(len(column_names)):
+                        # The magic line to allow Jinja2 to render any UTF-8 characters properly
                         try:
                             record_dict[column_names[i]] = record[i].decode('utf-8')
                         except (AttributeError, ValueError):
