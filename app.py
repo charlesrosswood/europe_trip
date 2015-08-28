@@ -11,6 +11,10 @@ import os
 import py_modules.views as views
 import py_modules.error_views as error_views
 
+
+app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False
+
 if platform.system() in ['Windows', 'Darwin']:  # local dev server
     if platform.system() == 'Windows':
         _PASSWORD_ = 'rinhio616'
@@ -32,11 +36,24 @@ else:  # heroku
 
     _DEBUG_ = True
 
+    import logging
+    import sys
+
+    # Configure logging.
+    app.logger.setLevel(logging.DEBUG)
+    del app.logger.handlers[:]
+
+    handler = logging.StreamHandler(stream=sys.stdout)
+    handler.setLevel(logging.DEBUG)
+    handler.formatter = logging.Formatter(
+        fmt=u"%(asctime)s level=%(levelname)s %(message)s",
+        datefmt="%Y-%m-%dT%H:%M:%SZ",
+    )
+    app.logger.addHandler(handler)
+
 db = DatabaseApis(host=_HOST_, dbname=_DBNAME_, user=_USER_,
     password=_PASSWORD_)
 
-app = Flask(__name__)
-app.config['JSON_AS_ASCII'] = False
 
 
 # Views that render templates
