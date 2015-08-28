@@ -98,6 +98,8 @@ class DatabaseConfig(object):
 
                 records = db_cursor.fetchall()
 
+                print(records)
+
                 # this will be slow
                 for record in records:
                     record_dict = {}
