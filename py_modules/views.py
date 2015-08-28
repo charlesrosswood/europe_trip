@@ -205,6 +205,7 @@ class DatabaseApis(DatabaseConfig):
             'users': user_uploads
         }
 
+        print(context)
         response_object = Response(response=json.dumps(context), status=200,
             mimetype='application/json')
 

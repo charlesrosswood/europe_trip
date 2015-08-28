@@ -105,8 +105,10 @@ class DatabaseConfig(object):
                     record_dict = {}
                     for i in range(len(column_names)):
                         try:
+                            print('with decoding:\t\t', record[i].decode('utf-8'))
                             record_dict[column_names[i]] = record[i].decode('utf-8')
                         except (AttributeError, ValueError):
+                            print('no decoding:\t\t', record[i])
                             record_dict[column_names[i]] = record[i]
                     cleaned_records.append(record_dict)
 
