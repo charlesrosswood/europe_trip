@@ -100,14 +100,11 @@ class DatabaseConfig(object):
 
                 # this will be slow
                 for record in records:
-                    print('record:        ', record)
                     record_dict = {}
                     for i in range(len(column_names)):
                         try:
-                            print('with decoding:        ', record[i].decode('utf-8'))
                             record_dict[column_names[i]] = record[i].decode('utf-8')
                         except (AttributeError, ValueError):
-                            print('no decoding:        ', record[i])
                             record_dict[column_names[i]] = record[i]
                     cleaned_records.append(record_dict)
 

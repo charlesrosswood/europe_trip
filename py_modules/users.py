@@ -80,7 +80,6 @@ class User(object):
 
         print('posts', posts)
 
-        posts_clean = []
         for post in posts:
             post_id = post.get('id', None)
             img_where_string = ["post_id='%s'" % post_id]
@@ -88,7 +87,7 @@ class User(object):
             images = db_images['result']
             post.setdefault('images', images)
 
-        users_uploads['posts'] = sorted(posts_clean, key=itemgetter('post_timestamp'), reverse=True)
+        users_uploads['posts'] = sorted(posts, key=itemgetter('post_timestamp'), reverse=True)
 
         return users_uploads
 
