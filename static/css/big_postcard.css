@@ -111,7 +111,7 @@
   #status {
     display: block;
     width: 100%;
-    height: calc(70% - 34px - 20px - 150px - 59px - 3px);
+    height: calc(80% - 34px - 20px - 150px - 59px - 3px);
     font-size: 15px;
   }
 
@@ -120,5 +120,9 @@
     height: 150px;
     width: 100%;
     margin-bottom: 3px;
+  }
+
+  #thumbnail-filmstrip {
+    height: 20%;
   }
 }
