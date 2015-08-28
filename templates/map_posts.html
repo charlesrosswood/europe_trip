@@ -35,7 +35,11 @@
 						</div><br/>
 					</div>
 					<div class="status-text">
-						{{ post.status_entry }}
+						{% if post.status_entry is not None %}
+							{{ post.status_entry }}
+						{% else %}
+							Location pin!
+						{% endif %}
 					</div><br/>
 					<div class="post-photo-filmstrip">
 						{% if post.images %}
