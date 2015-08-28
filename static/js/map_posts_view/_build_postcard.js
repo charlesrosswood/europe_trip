@@ -14,6 +14,9 @@ var buildPostcard = function(bigPostcardNode, post) {
   // create the title div to give the status text a lead in
   var titleDiv = document.createElement('div');
   titleDiv.setAttribute('id', 'title');
+  if (post.status_entry === null) {
+    post.status_entry = 'Location pin!';
+  }
   var title = post.status_entry.substring(0, post.status_entry.lastIndexOf(' ', 25)).concat('...');
   var titleText = document.createTextNode(title);
   titleDiv.appendChild(titleText);
