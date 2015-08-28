@@ -97,13 +97,12 @@ class DatabaseConfig(object):
                 column_names = [desc[0] for desc in db_cursor.description]
 
                 records = db_cursor.fetchall()
-                print(records)
 
                 # this will be slow
                 for record in records:
                     record_dict = {}
                     for i in range(len(column_names)):
-                        record_dict[column_names[i]] = record[i]
+                        record_dict[column_names[i]] = record[i].decode('utf-8')
                     cleaned_records.append(record_dict)
 
                 db_cursor.close()

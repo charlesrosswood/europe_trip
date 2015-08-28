@@ -85,8 +85,6 @@ class User(object):
             db_images = db.select_from_table('images', where=img_where_string)
             images = db_images['result']
             post.setdefault('images', images)
-            if post_id != 74:
-                posts_clean.append(post)
 
         users_uploads['posts'] = sorted(posts_clean, key=itemgetter('post_timestamp'), reverse=True)
 
