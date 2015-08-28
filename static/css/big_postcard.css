@@ -70,10 +70,15 @@
   display: inline-block;
   width: calc(100% - 200px);
   vertical-align: top;
-  height: calc(70% - 34px - 20px);
+  height: calc(70% - 34px - 20px - 59px);
   overflow: scroll;
   font-family: 'Lato', sans-serif;
   font-size: 20px;
+}
+
+.upload-container {
+  font-size: 10pt;
+  height: 59px;
 }
 
 #minimap-container {
@@ -106,7 +111,7 @@
   #status {
     display: block;
     width: 100%;
-    height: calc(70% - 34px - 20px - 150px);
+    height: calc(70% - 34px - 20px - 150px - 59px - 3px);
     font-size: 15px;
   }
 
@@ -114,5 +119,6 @@
     display: block;
     height: 150px;
     width: 100%;
+    margin-bottom: 3px;
   }
 }

@@ -157,7 +157,7 @@ for (var i = 0; i < postcards.length; i++) {
     var postcardNode = findAncestor(event.target, 'postcard');
 
     var postcardId = parseInt(postcardNode.getAttribute('data-postcard-id'));
-    // TODO: do something, pop up big postcard
+    bigPostcardNode.setAttribute('data-postcard-id', postcardId);
 
     toggleClass(bigPostcardNode, 'fade-in');
     toggleClass(bigPostcardNode, 'active');
@@ -208,7 +208,7 @@ pictureCloseIcon.addEventListener('click', function() {
 //});
 //
 
-},{"../common_modules/_allowed_urls":2,"../common_modules/_http_client":4,"../common_modules/_loading":5,"../common_modules/_modify_classes":6,"./_build_postcard":7}],2:[function(require,module,exports){
+},{"../common_modules/_allowed_urls":2,"../common_modules/_http_client":5,"../common_modules/_loading":6,"../common_modules/_modify_classes":7,"./_build_postcard":8}],2:[function(require,module,exports){
 var endPoints = (function() {
   return {
 
@@ -264,6 +264,91 @@ var endPoints = (function() {
 // Export the endPoints module
 exports.endPoints = endPoints;
 },{}],3:[function(require,module,exports){
+var HttpClient = require('./_http_client').HttpClient;
+var endPoints = require('./_allowed_urls').endPoints;
+var doneLoading = require('../common_modules/_loading').doneLoading;
+
+function hasAuthKey() {
+  for (var key in localStorage) {
+    if (key === 'auth_token') {
+      return true;
+    }
+  }
+  return false;
+}
+
+function deleteAuthKey() {
+  localStorage.removeItem('auth_token');
+}
+
+function deleteUserId() {
+  localStorage.removeItem('user_id');
+}
+
+function getAuthKey() {
+  return localStorage.getItem('auth_token');
+}
+
+function getUserId() {
+  return localStorage.getItem('user_id');
+}
+
+function saveNewAuthKey(authKey) {
+  localStorage.setItem('auth_token', authKey);
+}
+
+function saveUserId(userId) {
+  localStorage.setItem('user_id', userId);
+}
+
+function savePassword(username, password, callBack, params) {
+  var aClient = new HttpClient();
+  var authUrl = endPoints.getAuthKey.url;
+
+  var bodyData = {
+    'username': username,
+    'password': password
+  };
+
+  aClient.post(authUrl, bodyData, function(response, status) {
+    if (status == 200) {
+      var response = JSON.parse(response);
+      saveNewAuthKey(response.auth_token);
+      saveUserId(parseInt(response.user_id));
+      callBack(params, {
+          authToken: getAuthKey(),
+          userId: getUserId()
+      });
+    } else {
+      alert('Authorisation failed.');
+      doneLoading();
+    }
+  });
+}
+
+var logoutUser = function(callBack) {
+  deleteAuthKey();
+  deleteUserId();
+  callBack();
+}
+
+var fetchUserAuth = function(params, callBack) {
+  if (hasAuthKey()) {
+    callBack(params, {
+      authToken: getAuthKey(),
+      userId: getUserId()
+    });
+  } else {
+    var username = prompt('Enter your username');
+    var password = prompt('Enter your password');
+    savePassword(username, password, callBack, params);
+  }
+};
+
+exports.fetchUserAuth = fetchUserAuth;
+exports.logoutUser = logoutUser;
+
+},{"../common_modules/_loading":6,"./_allowed_urls":2,"./_http_client":5}],4:[function(require,module,exports){
 var removeContents = function(node) {
   var nodesToDelete = [];
   // remove all the previous children nodes
@@ -332,7 +417,7 @@ var createNodeWithText = function(nodeType, text, label) {
 exports.removeContents = removeContents;
 exports.createNodeWithContent = createNodeWithContent;
 exports.createNodeWithText = createNodeWithText;
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var HttpClient = function() {
 
   function buildFormData(jsonObj) {
@@ -417,7 +502,7 @@ var HttpClient = function() {
 
 // Export the HttpClient module
 exports.HttpClient = HttpClient;
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var toggleClass = require('../common_modules/_modify_classes').toggleClass;
 var addClass = require('../common_modules/_modify_classes').addClass;
 var removeClass = require('../common_modules/_modify_classes').removeClass;
@@ -469,7 +554,7 @@ exports.toggleLoading = toggleLoading;
 exports.showLoading = showLoading;
 exports.doneLoading = doneLoading;
 exports.checkLoaded = checkLoaded;
-},{"../common_modules/_modify_classes":6}],6:[function(require,module,exports){
+},{"../common_modules/_modify_classes":7}],7:[function(require,module,exports){
 var hasClass = function(node, className) {
   var nodeClassNames = node.className.split(' ');
 
@@ -539,9 +624,15 @@ exports.addClass = addClass;
 exports.removeClass = removeClass;
 exports.toggleClass = toggleClass;
 exports.findAncestor = findAncestor;
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var addClass = require('../common_modules/_modify_classes').addClass;
 var removeContents = require('../common_modules/_dom_manipulation').removeContents;
+var createNodeWithContent = require('../common_modules/_dom_manipulation').createNodeWithContent;
+var showLoading = require('../common_modules/_loading').showLoading;
+var doneLoading = require('../common_modules/_loading').doneLoading;
+var HttpClient = require('../common_modules/_http_client').HttpClient;
+var endPoints = require('../common_modules/_allowed_urls').endPoints;
+var fetchUserAuth = require('../common_modules/_auth').fetchUserAuth;
 
 var buildPostcard = function(bigPostcardNode, post) {
   removeContents(bigPostcardNode);
@@ -622,6 +713,36 @@ var buildPostcard = function(bigPostcardNode, post) {
   }
   bigPostcardNode.appendChild(thumbnailStrip);
 
+  var uploadContainer = createNodeWithContent('div', 'Add more images');
+  uploadContainer.appendChild(document.createElement('br'));
+  addClass(uploadContainer, 'upload-container');
+
+  var imageUploadNode = document.createElement('input');
+  imageUploadNode.type = 'file';
+  imageUploadNode.setAttribute('multiple', 'true');
+  imageUploadNode.setAttribute('id', 'add-photos');
+  uploadContainer.appendChild(imageUploadNode);
+
+  var uploadButton = document.createElement('input');
+  uploadButton.type = 'button';
+  uploadButton.setAttribute('value', 'Upload');
+  uploadButton.setAttribute('id', 'upload-button');
+  uploadContainer.appendChild(uploadButton);
+
+  bigPostcardNode.appendChild(uploadContainer);
+
+  uploadButton.addEventListener('click', function() {
+    var imagesToUpload = document.getElementById('add-photos').files;
+    var params = {
+      files: imagesToUpload,
+      postId: parseInt(bigPostcardNode.getAttribute('data-postcard-id'))
+    };
+
+    console.log(params);
+
+    fetchUserAuth(params, updateWithImages);
+  });
+
   // for some reason Google maps cannot handle a div that transitions, so refresh it at the end
   refreshMiniMap(post, miniMapContainer.miniMap);
 };
@@ -668,6 +789,53 @@ function refreshMiniMap(post, miniMap) {
   miniMap.setCenter(postLocation);
 }
 
+function updateWithImages(params, userData) {
+  if (params.files && (params.files.length > 0)) {
+    for (var i = 0; i < params.files.length; i++) {
+      showLoading();
+      var file = params.files[i];
+
+      var cClient = new HttpClient();
+
+      cClient.postImgur(file, function(cResponse, cStatus) {
+        if (cStatus == 200) {
+          imgurSuccess = true;
+          doneLoading();
+          var imgurResponse = JSON.parse(cResponse);
+          var imgurUrl = imgurResponse.data.link;
+          var imgurDeleteHash = imgurResponse.data.deletehash;
+
+          showLoading();
+          var dBodyData = {
+            columns: ['post_id', 'image_url', 'image_deletehash'] ,
+            values: [[parseInt(params.postId), imgurUrl, imgurDeleteHash]],
+            auth_token: userData.authToken
+          };
+
+          var dClient = new HttpClient();
+          dClient.post(endPoints.writeTable('images').url, dBodyData, function(dResponse,
+          dStatus) {
+            if (dStatus == 201) {
+              imageSuccess = true;
+              doneLoading();
+              console.log('we uploaded and updated images!');
+              window.location.href = window.location.href;
+            } else {
+              doneLoading();
+              alert('failed to add imgur URL to post');
+              console.log(dResponse, dStatus);
+            }
+          }, function() {
+            alert('failed to add imgur URL to post');
+            doneLoading();
+          });
+        }
+      });
+    }
+  }
+};
+
 // export module public APIs here
 exports.buildPostcard = buildPostcard;
-},{"../common_modules/_dom_manipulation":3,"../common_modules/_modify_classes":6}]},{},[1]);
+
+},{"../common_modules/_allowed_urls":2,"../common_modules/_auth":3,"../common_modules/_dom_manipulation":4,"../common_modules/_http_client":5,"../common_modules/_loading":6,"../common_modules/_modify_classes":7}]},{},[1]);

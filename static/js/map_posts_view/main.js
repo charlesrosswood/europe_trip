@@ -156,7 +156,7 @@ for (var i = 0; i < postcards.length; i++) {
     var postcardNode = findAncestor(event.target, 'postcard');
 
     var postcardId = parseInt(postcardNode.getAttribute('data-postcard-id'));
-    // TODO: do something, pop up big postcard
+    bigPostcardNode.setAttribute('data-postcard-id', postcardId);
 
     toggleClass(bigPostcardNode, 'fade-in');
     toggleClass(bigPostcardNode, 'active');
