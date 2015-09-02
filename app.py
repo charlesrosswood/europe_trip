@@ -13,7 +13,7 @@ import py_modules.error_views as error_views
 
 if platform.system() in ['Windows', 'Darwin']:  # local dev server
     if platform.system() == 'Windows':
-        _PASSWORD_ = 'rinhio616'
+        _PASSWORD_ = ''  # TODO: update password on Windows machines
     else:
         _PASSWORD_ = ''
     _HOST_ = 'localhost'
