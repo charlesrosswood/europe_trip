@@ -35,7 +35,7 @@ class DatabaseConfig(object):
     """
 
     def __init__(self, host, dbname, user, password, port):
-        """
+        """MyFileContext('a_test_file.txt')
         Use this to instantiate the Database config class
 
         :param host:
